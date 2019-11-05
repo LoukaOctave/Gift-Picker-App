@@ -6,12 +6,13 @@ Allow users to store birthdays of their loved ones as well a personal wishlist. 
 ### In
  * User login/signup screen. Option to retain information.
  * Calendar screen with all birthdays. Basic.
- * Creation screen to add entries. Name, date and wishlist.
+ * Creation screen to add entries. Name and date required, wishlist optional.
  * Specific date viewing screen. View birthdays for a single day.
  * Specific birthday viewing screen. View information for a single birthday.
  * Specific wishlist viewing screen. View wishlist items. Button to search for deals online.
- * Options/preferences screen. ...
+ * Options/preferences menu. ...
+ ### Extra
+ * Alternative methods to add birthdays (importing from other apps: Facebook, Contacts, Calendar, etc.).
+ * Option to export birthdays to other apps.
  ### Out
- * Alternative methods to add birthdays (importing from other apps).
- * Option to export calendar to other apps.
- * Hashing the stored user-passwords.
+ * Hashing stored user-passwords.
