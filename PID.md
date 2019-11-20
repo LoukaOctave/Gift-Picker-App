@@ -1,18 +1,17 @@
 # Birthday Gift App
-## Project Goals
-Allow users to store birthdays of their loved ones as well a personal wishlist. The app will remind the user when a birthday is coming up and help them pick a gift.
+## Wat is de bedoeling van jouw project?
+Een app maken die gebruikers toelaat om verjaardagen en persoonlijke wishlists bij te houden. Ook zal de app het uitkiezen van een verjaardagscadeau vereenvoudigen.
 
 ## Scope
 ### In
- * User login/signup screen. Option to retain information.
- * Calendar screen with all birthdays. Basic.
- * Creation screen to add entries. Name and date required, wishlist optional.
- * Specific date viewing screen. View birthdays for a single day.
- * Specific birthday viewing screen. View information for a single birthday.
- * Specific wishlist viewing screen. View wishlist items. Button to search for deals online.
- * Options/preferences menu. ...
- ### Extra
- * Alternative methods to add birthdays (importing from other apps: Facebook, Contacts, Calendar, etc.).
- * Option to export birthdays to other apps.
+ * Zich kunnen registreren en aanmelden.
+ * Verjaardagen van personen manueel kunnen toevoegen en eventueel er een wishlist aan koppelen.
+ * Eenvoudige/overzichtelijke interface.
+ * Verschillende views (yearly/monthly/weekly calendar, single day, single birthday, single wishlist, single gift).
+ * Gebruiker moet genotifieerd worden wanneer een verjaardag nadert.
+ * Online deals/recommendaties vinden op basis van keywords uit de wishlists (helpt de gebruiker cadeaus uit te zoeken).
  ### Out
- * Hashing stored user-passwords.
+ * Paswoord encryptie.
+ * Linken van kalender met andere apps.
+ 
+ * Voorlopig zijn de scopes voor beide versies (native en hybride) van de app hetzelfde.
