@@ -10,6 +10,7 @@ Een app maken die gebruikers toelaat om verjaardagen en persoonlijke wishlists b
  * Verschillende views (yearly/monthly/weekly calendar, single day, single birthday, single wishlist, single gift).
  * Gebruiker moet genotifieerd worden wanneer een verjaardag nadert.
  * Online deals/recommendaties vinden op basis van keywords uit de wishlists (helpt de gebruiker cadeaus uit te zoeken).
+ * Gebruiker kan bepaalde instellingen wijzigen.
  ### Out
  * Paswoord encryptie.
  * Linken van kalender met andere apps.
