@@ -1,6 +1,2 @@
-giftPickerApp/hooks
-giftPickerApp/node-modules
-giftPickerApp/platforms
-giftPickerApp/plugins
-giftPickerApp/*.xml
-giftPickerApp/*.json
+giftPickerApp/*
+!giftPickerApp/www
