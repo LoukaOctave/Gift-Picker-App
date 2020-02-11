@@ -1,5 +1,6 @@
 giftPickerApp/hooks
+giftPickerApp/node-modules
 giftPickerApp/platforms
 giftPickerApp/plugins
-giftPickerApp/config.xml
-giftPickerApp/package.json
+giftPickerApp/*.xml
+giftPickerApp/*.json
