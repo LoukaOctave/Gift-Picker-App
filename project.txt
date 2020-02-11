@@ -1,0 +1,34 @@
+Birthday app/Gift app
+
+Keeps birthdays and wishlists.
+
+User can add an entry which includes:
+-person's name
+-birthday date
+-list of keywords (wishlist for that person)
+
+This information can be altered at any time.
+
+A set period before a person's birthday, the user will be notified and reminded to look for a birthday gift.
+If the person already has a wishlist attributed to them, the app will return a list of related shopping items (extra: currently on promotion).
+
+Information about birthday:
+-name
+-day
+-month
+-year (optional) --> when notified age wont be showed
+-wishlist (optional) --> when notified user will be prompted to add items to the wishlist
+
+
+How to switch between pages
+Click on date in calendar	-->	brings you to the date page
+Click on birthday on date	-->	brings you to the birthday page
+Click on wishlist on birthday	-->	brings you to the wishlist page
+
+Every page has a back button which links to the URL of the most recent page before the current one.
+
+Calendar page:
+calendar with dates. birthdays are highlighted. name and age of person is shown.
+
+Date page:
+fullscreen/card listing of birthdays on that date. 
