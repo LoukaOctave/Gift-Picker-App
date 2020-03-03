@@ -1,4 +1,4 @@
-# Birthday Gift App
+# Gift Picker App
 ## Wat is de bedoeling van jouw project?
 Een app maken die gebruikers toelaat om verjaardagen en persoonlijke wishlists bij te houden. Ook zal de app het uitkiezen van een verjaardagscadeau vereenvoudigen.
 
