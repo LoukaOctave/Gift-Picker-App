@@ -1,8 +1,0 @@
-install Node.js
-cmd > npm install cordova
-java 13|8 => PATH: C:\Program Files\Java\jdk1.8.0_221\bin
-Gradle => PATH: C:\Users\micha\gradle-5.6.2-all\gradle-5.6.2\bin
-Android studio => PATH: C:\Users\micha\.android\tools & C:\Users\micha\.android\tools\bin & C:\Android\Android Studio\bin
-
-cd "%ANDROID_HOME%"/tools/bin
-sdkmanager --licenses => accept all licenses
