@@ -51,17 +51,15 @@ body {
                                    /* offset horizontal: half of text area width */
 }
 
-/* Custom: calendar height*/
+/***********
+***CUSTOM***
+***********/
+
+ /* Calendar height */
 :root {
     --f7-calendar-height: 45em;
 }
 
-/*#add-event-button {
-    border-radius: 50%;
-    max-inline-size: 5em;
-    height: 5em;
-    margin: 0 auto;
-}*/
 
 /* Landscape layout (with min-width) */
 @media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {

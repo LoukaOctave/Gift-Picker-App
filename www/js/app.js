@@ -1,3 +1,6 @@
+//#region APP
+
+  //#region GENERAL
 var $$ = Dom7;
 
 var app = new Framework7({
@@ -27,7 +30,9 @@ var app = new Framework7({
   
 var mainView = app.views.create('.view-main');
 
-//#region FIREBASE
+  //#endregion GENERAL
+
+  //#region FIREBASE
 
   // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -50,11 +55,11 @@ var mainView = app.views.create('.view-main');
   let authWorkerAuth = firebase.auth(authWorkerApp);
   authWorkerAuth.setPersistence(firebase.auth.Auth.Persistence.NONE); // disables caching of account credentials
 
-//#endregion FIREBASE
+  //#endregion FIREBASE
 
-//#region HOME
+  //#region HOME
 
-  //#region CALENDAR
+    //#region CALENDAR
 
 /* https://framework7.io/docs/calendar.html#examples */
 var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August' , 'September' , 'October', 'November', 'December'];
@@ -93,8 +98,6 @@ var calendarInline = app.calendar.create({
   }
 });
 
-
-
 /* Adds all Firestore events to the calendar
   No parameters, no return
 
@@ -109,6 +112,7 @@ function addDateRangeDatesToCalendarEvents() {
     snapshot.docs.forEach(doc => {
       calendarInline.params.events.push(createDateRangeDate(doc.data().Datetime.toDate(), doc.data().Color, doc.id));
     });
+    // Consulted https://forum.framework7.io/t/dynamic-events-on-calendar/3679, on 15/06/2020 for additional info
     // IMPORTANT: update calendar when Date Range array has been added to calendar.params.events
     calendarInline.update();
   })
@@ -131,6 +135,38 @@ function createDateRangeDate(date, color, id) {
   };
 }
 
-//#endregion CALENDAR
+    //#endregion CALENDAR
 
-//#endregion HOME
+  //#endregion HOME
+
+  //#region CREATE-EVENT
+
+  /* The user can decide if the event to be created should be for a whole day, or for a specific time of the day (start and end time)
+  Whenever the createEvent page is initialised,
+    an eventListener will be placed on the "All-day" toggle.
+    Whenever the toggle is clicked,
+      it will check whether it is checked or not.
+        Based on the status of the toggle certain inputs will be hidden and others will be shown.
+  */
+  $$(document).on('page:init', '.page[data-name="createEvent"]', function (e) { // https://framework7.io/docs/page.html#page-events see page:init
+    var toggle = document.getElementById("createEventFormToggleAllDay");
+    var datetimeStart = document.getElementById("createEventFormDatetimeStart");
+    var datetimeEnd = document.getElementById("createEventFormDatetimeEnd");
+    var date = document.getElementById("createEventFormDate");
+    toggle.addEventListener("click", function(){
+      if(toggle.checked){
+        datetimeStart.classList = "display-none"; // https://framework7.io/docs/typography.html#element-display see display-none
+        datetimeEnd.classList = "display-none";
+        date.classList = "";
+      }
+      else {
+        datetimeStart.classList = "";
+        datetimeEnd.classList = "";
+        date.classList = "display-none";
+      }
+    });
+  })
+  
+  //#endregion CREATE-EVENT
+
+//#endregion APP

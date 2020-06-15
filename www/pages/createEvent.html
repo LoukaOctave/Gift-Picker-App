@@ -7,6 +7,98 @@
     </div>
   </div>
   <div class="page-content">
-    
+    <form class="list" id="createEventForm">
+      <ul>
+
+        <li>
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Title</div>
+              <div class="item-input-wrap">
+                <input type="text" name="title" placeholder="Event title...">
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title">All-day</div>
+              <div class="item-after">
+                <label class="toggle toggle-init">
+                  <input id="createEventFormToggleAllDay" type="checkbox" name="all-day"><i class="toggle-icon"></i>
+                </label>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li id="createEventFormDatetimeStart" class="">
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Start</div>
+              <div class="item-input-wrap">
+                <input type="datetime-local" name="start">
+              </div>
+            </div>
+          </div>
+        </li>
+        
+        <li id="createEventFormDatetimeEnd" class="">
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">End</div>
+              <div class="item-input-wrap">
+                <input type="datetime-local" name="end">
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li id="createEventFormDate" class="display-none">
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Date</div>
+              <div class="item-input-wrap">
+                <input type="date" name="date">
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Description</div>
+              <div class="item-input-wrap">
+                <input type="text" name="description" placeholder="Description...">
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Gender</div>
+              <div class="item-input-wrap">
+                <select name="gender">
+                  <option value="male" selected>Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        
+
+      </ul>
+    </form>
+    <div class="block block-strong row">
+      <div class="col"><a class="button convert-form-to-data" href="#">Get Data</a></div>
+      <div class="col"><a class="button fill-form-from-data" href="#">Fill Form</a></div>
+    </div>
   </div>
 </div>
