@@ -38,6 +38,3 @@ Thumbs.db
 cordova/platforms/
 cordova/plugins/
 cordova/www/
-
-# Production build
-www/
