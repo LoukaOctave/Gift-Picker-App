@@ -34,6 +34,7 @@ var mainView = app.views.create('.view-main');
 
   //#region FIREBASE
 
+  /* https://firebase.google.com/docs/web/setup#add-sdks-initialize */
   // Your web app's Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCaLqpl-6HU0gn3i-q9NqodfVqmU_tOhk0",
@@ -51,6 +52,7 @@ var mainView = app.views.create('.view-main');
   const db = firebase.firestore();
   const auth = firebase.auth();
   
+  // WHAT IS THIS FOR
   let authWorkerApp = firebase.initializeApp(firebase.app().options, 'auth-worker');
   let authWorkerAuth = firebase.auth(authWorkerApp);
   authWorkerAuth.setPersistence(firebase.auth.Auth.Persistence.NONE); // disables caching of account credentials
@@ -139,34 +141,42 @@ function createDateRangeDate(date, color, id) {
 
   //#endregion HOME
 
-  //#region CREATE-EVENT
+  //#region CREATE/UPDATE-EVENT
 
-  /* The user can decide if the event to be created should be for a whole day, or for a specific time of the day (start and end time)
-  Whenever the createEvent page is initialised,
-    an eventListener will be placed on the "All-day" toggle.
-    Whenever the toggle is clicked,
-      it will check whether it is checked or not.
-        Based on the status of the toggle certain inputs will be hidden and others will be shown.
-  */
+  // All the event type options available for event creation.
+  var eventTypeOptions = [{value:"birthday" , name:"Birthday"}, {value:"christmas" , name:"Christmas"}, {value:"newyear" , name:"New Year"}, {value:"chinesenewyear" , name:"Chinese New Year"}, {value:"valentinesday" , name:"Valentine's Day"}, {value:"mothersday" , name:"Mother's Day"}, {value:"fathersday" , name:"Father's Day"}, {value:"anniversary" , name:"Anniversary"}, {value:"hannukah" , name:"Hannukah"}, {value:"bartmitzvah" , name:"Bar/bat Mitzvah"}, {value:"wedding" , name:"Wedding"}, {value:"other" , name:"Other"}];
+
   $$(document).on('page:init', '.page[data-name="createEvent"]', function (e) { // https://framework7.io/docs/page.html#page-events see page:init
+    
+    /* The user can decide if the event to be created should be for a whole day, or for a specific time of the day (start and end time)
+    Whenever the createEvent page is initialised, an eventListener will be placed on the "All-day" toggle.
+    Whenever the toggle is clicked, it will check whether it is checked or not.
+    Based on the status of the toggle, the time inputs will be hidden or shown.
+    */
     var toggle = document.getElementById("createEventFormToggleAllDay");
-    var datetimeStart = document.getElementById("createEventFormDatetimeStart");
-    var datetimeEnd = document.getElementById("createEventFormDatetimeEnd");
-    var date = document.getElementById("createEventFormDate");
-    toggle.addEventListener("click", function(){
-      if(toggle.checked){
-        datetimeStart.classList = "display-none"; // https://framework7.io/docs/typography.html#element-display see display-none
-        datetimeEnd.classList = "display-none";
-        date.classList = "";
-      }
-      else {
-        datetimeStart.classList = "";
-        datetimeEnd.classList = "";
-        date.classList = "display-none";
-      }
+    var time = document.getElementById("createEventFormTime");
+    toggle.addEventListener("click", function() {
+      if(toggle.checked) { time.classList = "display-none"; } // https://framework7.io/docs/typography.html#element-display see display-none
+      else { time.classList = ""; }
     });
+  
+    fillSelectWithOptions();  
   })
   
-  //#endregion CREATE-EVENT
+  function fillSelectWithOptions() {
+    eventTypeOptions.forEach(option => {
+      var tlines = "";
+      tlines += "<option value='" + option.value + "' selected>" + option.name + "</option>" // https://framework7.io/docs/smart-select.html#examples see default setup
+      $$("#createEventFormSelectType").append(tlines);
+    })
+    document.getElementById("createEventFormSelectType").item(0).selected = 'selected'; // Auto select the first option
+  }
+  
+  
+
+  //$$("#createEventFormSelectType").html(tlines);
+
+
+  //#endregion CREATE/UPDATE-EVENT
 
 //#endregion APP

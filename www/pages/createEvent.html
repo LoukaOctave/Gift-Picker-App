@@ -34,29 +34,7 @@
           </div>
         </li>
 
-        <li id="createEventFormDatetimeStart" class="">
-          <div class="item-content item-input">
-            <div class="item-inner">
-              <div class="item-title item-label">Start</div>
-              <div class="item-input-wrap">
-                <input type="datetime-local" name="start">
-              </div>
-            </div>
-          </div>
-        </li>
-        
-        <li id="createEventFormDatetimeEnd" class="">
-          <div class="item-content item-input">
-            <div class="item-inner">
-              <div class="item-title item-label">End</div>
-              <div class="item-input-wrap">
-                <input type="datetime-local" name="end">
-              </div>
-            </div>
-          </div>
-        </li>
-
-        <li id="createEventFormDate" class="display-none">
+        <li>
           <div class="item-content item-input">
             <div class="item-inner">
               <div class="item-title item-label">Date</div>
@@ -67,6 +45,33 @@
           </div>
         </li>
 
+        <li id="createEventFormTime" class="">
+          <div class="item-content item-input">
+            <div class="item-inner">
+              <div class="item-title item-label">Start</div>
+              <div class="item-input-wrap">
+                <input type="time" name="start">
+              </div>  
+              <div class="item-title item-label">End</div>
+              <div class="item-input-wrap">
+                <input type="time" name="end">
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <a class="item-link smart-select smart-select-init">
+            <select id="createEventFormSelectType" name="type">
+            </select>
+            <div class="item-content">
+              <div class="item-inner">
+                <div class="item-title">Type</div>
+              </div>
+            </div>
+          </a>
+        </li> 
+
         <li>
           <div class="item-content item-input">
             <div class="item-inner">
@@ -76,23 +81,7 @@
               </div>
             </div>
           </div>
-        </li>
-
-        <li>
-          <div class="item-content item-input">
-            <div class="item-inner">
-              <div class="item-title item-label">Gender</div>
-              <div class="item-input-wrap">
-                <select name="gender">
-                  <option value="male" selected>Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </li>
-
-        
+        </li>        
 
       </ul>
     </form>
