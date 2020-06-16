@@ -112,11 +112,10 @@ function addDateRangeDatesToCalendarEvents() {
   // TODO: limit Events to ones owned by logged in user
   db.collection('Events').get().then((snapshot) => {
     snapshot.docs.forEach(doc => {
-      calendarInline.params.events.push(createDateRangeDate(doc.data().Datetime.toDate(), doc.data().Color, doc.id));
+      calendarInline.params.events.push(createDateRangeDate(doc.data().Date.toDate(), "#00ff00", doc.id));
     });
-    // Consulted https://forum.framework7.io/t/dynamic-events-on-calendar/3679, on 15/06/2020 for additional info
     // IMPORTANT: update calendar when Date Range array has been added to calendar.params.events
-    calendarInline.update();
+    calendarInline.update(); // (https://forum.framework7.io/t/dynamic-events-on-calendar/3679)
   })
 }
 
@@ -146,37 +145,87 @@ function createDateRangeDate(date, color, id) {
   // All the event type options available for event creation.
   var eventTypeOptions = [{value:"birthday" , name:"Birthday"}, {value:"christmas" , name:"Christmas"}, {value:"newyear" , name:"New Year"}, {value:"chinesenewyear" , name:"Chinese New Year"}, {value:"valentinesday" , name:"Valentine's Day"}, {value:"mothersday" , name:"Mother's Day"}, {value:"fathersday" , name:"Father's Day"}, {value:"anniversary" , name:"Anniversary"}, {value:"hannukah" , name:"Hannukah"}, {value:"bartmitzvah" , name:"Bar/bat Mitzvah"}, {value:"wedding" , name:"Wedding"}, {value:"other" , name:"Other"}];
 
-  $$(document).on('page:init', '.page[data-name="createEvent"]', function (e) { // https://framework7.io/docs/page.html#page-events see page:init
+  /* Fills the select input with the available options
+  */
+  function fillSelectWithOptions() {
+    eventTypeOptions.forEach(option => {
+      var tlines = "";
+      tlines += "<option value='" + option.value + "' selected>" + option.name + "</option>" // (https://framework7.io/docs/smart-select.html#examples see default setup)
+      $$("#input-type").append(tlines);
+    })
+    document.getElementById("input-type").item(0).selected = 'selected'; // Auto select the first option (https://stackoverflow.com/a/10911660)
+  }
+
+  $$(document).on('page:init', '.page[data-name="createEvent"]', function (e) { // (https://framework7.io/docs/page.html#page-events see page:init)
     
     /* The user can decide if the event to be created should be for a whole day, or for a specific time of the day (start and end time)
     Whenever the createEvent page is initialised, an eventListener will be placed on the "All-day" toggle.
     Whenever the toggle is clicked, it will check whether it is checked or not.
     Based on the status of the toggle, the time inputs will be hidden or shown.
     */
-    var toggle = document.getElementById("createEventFormToggleAllDay");
-    var time = document.getElementById("createEventFormTime");
+    let toggle = document.getElementById("input-all-day");
+    let time = document.getElementById("input-time");
     toggle.addEventListener("click", function() {
-      if(toggle.checked) { time.classList = "display-none"; } // https://framework7.io/docs/typography.html#element-display see display-none
+      if(toggle.checked) { time.classList = "display-none"; } // (https://framework7.io/docs/typography.html#element-display see display-none)
       else { time.classList = ""; }
     });
   
     fillSelectWithOptions();  
-  })
-  
-  function fillSelectWithOptions() {
-    eventTypeOptions.forEach(option => {
-      var tlines = "";
-      tlines += "<option value='" + option.value + "' selected>" + option.name + "</option>" // https://framework7.io/docs/smart-select.html#examples see default setup
-      $$("#createEventFormSelectType").append(tlines);
+  });
+
+
+  $$(document).on('click', '#button-create-event', function() {
+    let title = document.getElementById("input-title");
+    let allDay = document.getElementById("input-all-day");
+    let date = document.getElementById("input-date");
+    let start = document.getElementById("input-start");
+    let end = document.getElementById("input-end");
+    let type = document.getElementById("input-type");
+    let description = document.getElementById("input-description");
+    if(checkFormFields(title, allDay, date, start, end, type, description)){ createEvent(title, allDay, date, start, end, type, description); };
+  });
+
+
+  function checkFormFields(title, allDay, date, start, end, type, description) {
+    let bool = true;
+    let fieldsToCheck = [title, date, type, description];
+    if(!allDay.checked){
+      fieldsToCheck.push(start, end);
+    }
+    fieldsToCheck.forEach(field => {
+      if(field.value == "") {
+        bool = false;
+        // TODO: write function for when field is empty (error, alert, etc.)
+        console.log("Please fill in a " + field.name + ".");
+      }
     })
-    document.getElementById("createEventFormSelectType").item(0).selected = 'selected'; // Auto select the first option
+    return bool;
   }
-  
-  
 
-  //$$("#createEventFormSelectType").html(tlines);
-
+  /* Will add an event to the Cloud Firestore
+  Function based on: https://firebase.google.com/docs/firestore/manage-data/add-data?authuser=0#add_a_document
+  */
+  function createEvent(title, allDay, date, start, end, type, description) {
+    db.collection("Events").add({
+      Title: title.value,
+      AllDay: allDay.checked,
+      Date: firebase.firestore.Timestamp.fromDate(new Date(date.value + "T00:00:00")),
+      Start: start.value,
+      End: end.value,
+      Type: type.value,
+      Description: description.value,
+    })
+    .then(function() {
+      console.log("Document successfully written!");
+    })
+    .catch(function(error) {
+      console.error("Error writing document: ", error);
+    });
+  }
 
   //#endregion CREATE/UPDATE-EVENT
 
 //#endregion APP
+
+// TODO: Stick calendar to bottom, and add a date information panel on top of the page
+// TODO: 
