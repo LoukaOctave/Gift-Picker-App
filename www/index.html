@@ -38,6 +38,11 @@
               <div class="block-title">Calendar</div>
               <div class="block block-strong no-padding">
                 <div id="demo-calendar-inline-container"></div>
+                
+                
+                <!-- TODO: replace this "open login screen button" with an automatic user logged in check on page init -->
+                <button href="#" class="button login-screen-open" data-login-screen=".login-screen">Button</button>
+
               </div>
             </div>
           </div>
@@ -64,8 +69,50 @@
         <div id="view-createEvent" class="view view-init tab" data-view="createEvent" data-url="/createEvent/"></div>
         <!-- readProfile View -->
         <div id="view-readProfile" class="view view-init tab" data-view="readProfile" data-url="/readProfile/"></div>
+      </div>
+
+      <!-- Login Screen -->
+      <div class="login-screen">
+        <div class="view">
+          <div class="page">
+            <div class="page-content login-screen-content">
+              <div class="login-screen-title">Gift Picker App</div>
+              <form>
+                <div class="list">
+                  <ul>
+                    <li class="item-content item-input">
+                      <div class="item-inner">
+                        <div class="item-title item-label">Email</div>
+                        <div class="item-input-wrap">
+                          <input id="login-email" type="email" name="email" placeholder="Your email...">
+                        </div>
+                      </div>
+                    </li>
+                    <li class="item-content item-input">
+                      <div class="item-inner">
+                        <div class="item-title item-label">Password</div>
+                        <div class="item-input-wrap">
+                          <input id="login-password" type="password" name="password" placeholder="Your password...">
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="list">
+                  <ul>
+                    <li><a id="button-sign-in" class="list-button" href="#">Sign In</a></li>
+                    <li><a id="button-sign-up" class="list-button" href="#">Sign Up</a></li>
+                  </ul>
+                  <div class="block-footer">
+                    <p id="login-error" >Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p> 
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
@@ -75,11 +122,10 @@
     <!-- TODO: Add SDKs for Firebase products that you want to use https://firebase.google.com/docs/web/setup#available-libraries -->
     <!-- Path to Framework7 JS-->
     <script type="text/javascript" src="./framework7/js/framework7.bundle.min.js"></script>
-    <!-- Other js-->
+    <!-- JS (order cannot be altered) -->
     <script type="text/javascript" src="./js/routes.js"></script>
-    <script type="text/javascript" src="./js/auth.js"></script>
-    <!-- !!!LAST!!! cordova.js & app.js -->
     <script type="text/javascript" src="./js/cordova.js"></script>
     <script type="text/javascript" src="./js/app.js"></script>
+    <script type="text/javascript" src="./js/auth.js"></script>
   </body>
 </html> 

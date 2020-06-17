@@ -52,10 +52,10 @@ var mainView = app.views.create('.view-main');
   const db = firebase.firestore();
   const auth = firebase.auth();
   
-  // WHAT IS THIS FOR
-  let authWorkerApp = firebase.initializeApp(firebase.app().options, 'auth-worker');
-  let authWorkerAuth = firebase.auth(authWorkerApp);
-  authWorkerAuth.setPersistence(firebase.auth.Auth.Persistence.NONE); // disables caching of account credentials
+  // WHAT IS THIS FOR?
+  // let authWorkerApp = firebase.initializeApp(firebase.app().options, 'auth-worker');
+  // let authWorkerAuth = firebase.auth(authWorkerApp);
+  // authWorkerAuth.setPersistence(firebase.auth.Auth.Persistence.NONE); // disables caching of account credentials
 
   //#endregion FIREBASE
 
@@ -156,6 +156,40 @@ function createDateRangeDate(date, color, id) {
     document.getElementById("input-type").item(0).selected = 'selected'; // Auto select the first option (https://stackoverflow.com/a/10911660)
   }
 
+  /* Checks if the form fields are empty.
+  For all fields that are empty, there will be an error message. 
+  If at least one field is empty, it will return false, otherwise it returns true.
+  */
+  function checkFormFields(title, allDay, date, start, end, type, description) {
+    let bool = true;
+    let fieldsToCheck = [title, date, type, description];
+    if(!allDay.checked) { fieldsToCheck.push(start, end); }
+    fieldsToCheck.forEach(field => {
+      if(field.value == "") {
+        bool = false;
+        // TODO: write function for when field is empty (error, alert, etc.)
+        console.log("Please fill in a " + field.name + ".");
+      }
+    })
+    return bool;
+  }
+
+  /* Will hide or show the time inputs depending on the state of the toggle
+  */
+  function hideTimeInputs() {
+    let toggle = document.getElementById("input-all-day");
+    let time = document.getElementById("input-time");
+    if(toggle.checked) { time.classList = "display-none"; } // (https://framework7.io/docs/typography.html#element-display see display-none)
+    else { time.classList = ""; }
+  }
+
+  /* Resets the form.
+  */
+  function eraseData() {
+    document.getElementById("form-create-event").reset();
+    hideTimeInputs();
+  }
+
   $$(document).on('page:init', '.page[data-name="createEvent"]', function (e) { // (https://framework7.io/docs/page.html#page-events see page:init)
     
     /* The user can decide if the event to be created should be for a whole day, or for a specific time of the day (start and end time)
@@ -163,17 +197,15 @@ function createDateRangeDate(date, color, id) {
     Whenever the toggle is clicked, it will check whether it is checked or not.
     Based on the status of the toggle, the time inputs will be hidden or shown.
     */
-    let toggle = document.getElementById("input-all-day");
-    let time = document.getElementById("input-time");
-    toggle.addEventListener("click", function() {
-      if(toggle.checked) { time.classList = "display-none"; } // (https://framework7.io/docs/typography.html#element-display see display-none)
-      else { time.classList = ""; }
+    document.getElementById("input-all-day").addEventListener("click", function() {
+      hideTimeInputs();
     });
-  
     fillSelectWithOptions();  
   });
-
-
+  
+  /* Feeds all the input elements to the necessary functions to create an event.
+  Activates when the "Create Event" button is clicked.
+  */
   $$(document).on('click', '#button-create-event', function() {
     let title = document.getElementById("input-title");
     let allDay = document.getElementById("input-all-day");
@@ -185,24 +217,8 @@ function createDateRangeDate(date, color, id) {
     if(checkFormFields(title, allDay, date, start, end, type, description)){ createEvent(title, allDay, date, start, end, type, description); };
   });
 
-
-  function checkFormFields(title, allDay, date, start, end, type, description) {
-    let bool = true;
-    let fieldsToCheck = [title, date, type, description];
-    if(!allDay.checked){
-      fieldsToCheck.push(start, end);
-    }
-    fieldsToCheck.forEach(field => {
-      if(field.value == "") {
-        bool = false;
-        // TODO: write function for when field is empty (error, alert, etc.)
-        console.log("Please fill in a " + field.name + ".");
-      }
-    })
-    return bool;
-  }
-
-  /* Will add an event to the Cloud Firestore
+  /* Adds an event to the Cloud Firestore.
+  If event is added succesfully, form will be emptied and reset.
   Function based on: https://firebase.google.com/docs/firestore/manage-data/add-data?authuser=0#add_a_document
   */
   function createEvent(title, allDay, date, start, end, type, description) {
@@ -217,11 +233,19 @@ function createDateRangeDate(date, color, id) {
     })
     .then(function() {
       console.log("Document successfully written!");
+      eraseData();
     })
     .catch(function(error) {
       console.error("Error writing document: ", error);
     });
   }
+
+  /* Resets the form.
+  Activates when the "Erase Data" button is clicked.
+  */
+  $$(document).on('click', '#button-clear-form', function() {
+    eraseData();
+  });
 
   //#endregion CREATE/UPDATE-EVENT
 
