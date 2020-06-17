@@ -58,12 +58,11 @@ body {
  /* Home screen Calendar 
  Change the height
  */
-:root {
-    --f7-calendar-height: 45em;
-}
+
 
 /* Login screen Keep me logged in Toggle 
 Make child elements align next to eachother
+https://css-tricks.com/snippets/css/a-guide-to-flexbox/
 */
 .login-toggle-list-item {
     display: flex;

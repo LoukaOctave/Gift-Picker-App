@@ -1,3 +1,5 @@
+//#region AUTH
+
 // DOM elements
 var loginScreen = document.querySelector(".login-screen");
 var loginForm = document.getElementById("login-form");
@@ -90,3 +92,5 @@ function userSignOut() {
         console.log(error.message);
     })
 }
+
+//#endregion AUTH
