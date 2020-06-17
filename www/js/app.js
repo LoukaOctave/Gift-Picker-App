@@ -30,6 +30,11 @@ var app = new Framework7({
   
 var mainView = app.views.create('.view-main');
 
+function getCurrentUserId() {
+  if (sessionStorage.getItem("userID")) {return sessionStorage.getItem("userID"); }
+  else if (localStorage.getItem("userID")) {return localStorage.getItem("userID"); }
+}
+
   //#endregion GENERAL
 
   //#region FIREBASE
@@ -92,7 +97,7 @@ var calendarInline = app.calendar.create({
         calendarInline.nextMonth();
       });
       // Execute custom function
-      addDateRangeDatesToCalendarEvents();
+      updateDateRangeDatesInCalendarEvents();
     },
     monthYearChangeStart: function (c) {
       $$('.calendar-custom-toolbar .center').text(monthNames[c.currentMonth] +', ' + c.currentYear);
@@ -108,9 +113,9 @@ var calendarInline = app.calendar.create({
       Converts necessary Event document data to a format that can populate the calendar.params.events (Date Range format)
     Updates calendar
 */
-function addDateRangeDatesToCalendarEvents() {
-  // TODO: limit Events to ones owned by logged in user
-  db.collection('Events').get().then((snapshot) => {
+function updateDateRangeDatesInCalendarEvents() {
+  db.collection('Events').where('Creator', '==', getCurrentUserId()).get().then((snapshot) => {
+    calendarInline.params.events = [];
     snapshot.docs.forEach(doc => {
       calendarInline.params.events.push(createDateRangeDate(doc.data().Date.toDate(), "#00ff00", doc.id));
     });
@@ -185,7 +190,7 @@ function createDateRangeDate(date, color, id) {
 
   /* Resets the form.
   */
-  function eraseData() {
+  function formEventEraseData() {
     document.getElementById("form-create-event").reset();
     hideTimeInputs();
   }
@@ -223,6 +228,7 @@ function createDateRangeDate(date, color, id) {
   */
   function createEvent(title, allDay, date, start, end, type, description) {
     db.collection("Events").add({
+      Creator: getCurrentUserId(),
       Title: title.value,
       AllDay: allDay.checked,
       Date: firebase.firestore.Timestamp.fromDate(new Date(date.value + "T00:00:00")),
@@ -233,7 +239,7 @@ function createDateRangeDate(date, color, id) {
     })
     .then(function() {
       console.log("Document successfully written!");
-      eraseData();
+      formEventEraseData();
     })
     .catch(function(error) {
       console.error("Error writing document: ", error);
@@ -244,7 +250,7 @@ function createDateRangeDate(date, color, id) {
   Activates when the "Erase Data" button is clicked.
   */
   $$(document).on('click', '#button-clear-form', function() {
-    eraseData();
+    formEventEraseData();
   });
 
   //#endregion CREATE/UPDATE-EVENT
@@ -252,4 +258,4 @@ function createDateRangeDate(date, color, id) {
 //#endregion APP
 
 // TODO: Stick calendar to bottom, and add a date information panel on top of the page
-// TODO: 
+// TODO: Add pull to refresh for home page

@@ -55,11 +55,28 @@ body {
 ***CUSTOM***
 ***********/
 
- /* Calendar height */
+ /* Home screen Calendar 
+ Change the height
+ */
 :root {
     --f7-calendar-height: 45em;
 }
 
+/* Login screen Keep me logged in Toggle 
+Make child elements align next to eachother
+*/
+.login-toggle-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Login screen Keep me logged in Toggle
+Add some spacing between child elements
+*/
+.login-toggle-list-item * {
+    padding: 0 0.5em;
+}
 
 /* Landscape layout (with min-width) */
 @media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {

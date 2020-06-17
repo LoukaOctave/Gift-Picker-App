@@ -38,11 +38,6 @@
               <div class="block-title">Calendar</div>
               <div class="block block-strong no-padding">
                 <div id="demo-calendar-inline-container"></div>
-                
-                
-                <!-- TODO: replace this "open login screen button" with an automatic user logged in check on page init -->
-                <button href="#" class="button login-screen-open" data-login-screen=".login-screen">Button</button>
-
               </div>
             </div>
           </div>
@@ -55,29 +50,28 @@
               <i class="icon f7-icons if-not-md">house_fill</i>
               <span class="tabbar-label">Home</span>
             </a>
-            <a class="tab-link" id="add-button" href="#view-createEvent">
+            <a class="tab-link" id="add-button" href="#view-create-event">
               <i class="icon f7-icons if-not-md">plus_circle</i>
               <span class="tabbar-label">Add</span>
             </a>
-            <a class="tab-link" id="profile-button" href="#view-readProfile">
+            <a class="tab-link" id="profile-button" href="#view-read-profile">
               <i class="icon f7-icons if-not-md">person_fill</i>
               <span class="tabbar-label">Profile</span>
             </a>
           </div>
         </div>
         <!-- createEvent View -->
-        <div id="view-createEvent" class="view view-init tab" data-view="createEvent" data-url="/createEvent/"></div>
+        <div id="view-create-event" class="view view-init tab" data-view="createEvent" data-url="/createEvent/"></div>
         <!-- readProfile View -->
-        <div id="view-readProfile" class="view view-init tab" data-view="readProfile" data-url="/readProfile/"></div>
+        <div id="view-read-profile" class="view view-init tab" data-view="readProfile" data-url="/readProfile/"></div>
       </div>
-
       <!-- Login Screen -->
       <div class="login-screen">
         <div class="view">
           <div class="page">
             <div class="page-content login-screen-content">
               <div class="login-screen-title">Gift Picker App</div>
-              <form>
+              <form id="login-form">
                 <div class="list">
                   <ul>
                     <li class="item-content item-input">
@@ -100,11 +94,17 @@
                 </div>
                 <div class="list">
                   <ul>
+                    <li class="login-toggle-list-item">
+                      <p>Keep me logged in</p>
+                      <label class="toggle toggle-init">
+                        <input id="login-toggle" type="checkbox" name="keep-me-logged-in"><i class="toggle-icon"></i>
+                      </label>
+                    </li>
                     <li><a id="button-sign-in" class="list-button" href="#">Sign In</a></li>
                     <li><a id="button-sign-up" class="list-button" href="#">Sign Up</a></li>
                   </ul>
                   <div class="block-footer">
-                    <p id="login-error" >Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p> 
+                    <p id="login-message"></p> 
                   </div>
                 </div>
               </form>
@@ -112,7 +112,6 @@
           </div>
         </div>
       </div>
-
     </div>
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
