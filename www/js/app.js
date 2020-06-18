@@ -387,6 +387,24 @@ function getCurrentUserId() {
 
 //#endregion APP
 
-// TODO: Stick calendar to bottom, and add a date information panel on top of the page
+/*********
+***TODO***
+*********/
+
+/* General */
+// TODO: Clicking back button twice gives 404. Fix this.
+// TODO: Settings button on top navbar that opens settings page
+
+/* Home */
 // TODO: Add pull to refresh for home page
-// TODO: clicking back twice leaves you stranded
+
+/* Update event */
+// TODO: Auto-fill fields on updateEvent
+
+/* Settings */
+// TODO: Sign Out button on settings page
+// TODO: Add possibility to change password
+// TODO: Add possibility to change GUI color
+// TODO: Add dark mode toggle
+
+// ... more
