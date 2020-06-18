@@ -30,9 +30,18 @@ var app = new Framework7({
   
 var mainView = app.views.create('.view-main');
 
+/* Returns the userID that is currently stored.
+ */
 function getCurrentUserId() {
-  if (sessionStorage.getItem("userID")) {return sessionStorage.getItem("userID"); }
-  else if (localStorage.getItem("userID")) {return localStorage.getItem("userID"); }
+  /* We need to fill in the currentUserID variable,
+  otherwise on when app is launched (no ID in local or session storage),
+  this value will be null and the database function in updateDateRangeDatesInCalendarEvents() will lack arguments and fail calendar creation.
+  Calendar will not be able to update after login, because it hasn't been created properly.
+  */
+  let currentUserID = "no ID"; 
+  if (sessionStorage.getItem("userID")) { currentUserID = sessionStorage.getItem("userID"); }
+  else if (localStorage.getItem("userID")) { currentUserID = localStorage.getItem("userID"); }
+  return currentUserID;
 }
 
   //#endregion GENERAL
@@ -64,7 +73,7 @@ function getCurrentUserId() {
 
   //#endregion FIREBASE
 
-  //#region HOME
+  //#region HOME  
 
     //#region CALENDAR
 
@@ -106,9 +115,8 @@ function getCurrentUserId() {
       }
     });
 
-    /* Adds all Firestore events to the calendar
-      No parameters, no return
-
+    /* Adds Firestore Events to the calendar.
+      No parameters, no return value.
       Gets all Events from Firestore
         Iterates list of Events
           Converts necessary Event document data to a format that can populate the calendar.params.events (Date Range format)
@@ -118,7 +126,7 @@ function getCurrentUserId() {
       db.collection('Events').where('Creator', '==', getCurrentUserId()).get().then((snapshot) => {
         calendarInline.params.events = [];
         snapshot.docs.forEach(doc => {
-          calendarInline.params.events.push(createDateRangeDate(doc.data().Date.toDate(), "#00ff00", doc.id));
+          calendarInline.params.events.push(createDateRangeDate(doc.data().Date.toDate(), "#ff0000", doc.id));
         });
         // IMPORTANT: update calendar when Date Range array has been added to calendar.params.events
         calendarInline.update(); // (https://forum.framework7.io/t/dynamic-events-on-calendar/3679)
@@ -152,11 +160,15 @@ function getCurrentUserId() {
 
     //#endregion CALENDAR
 
+  // List of full weekday names.
   const weekdayNames = [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' ];
 
+  // Functions to be executed at the start.
   fillDateInfoCardHeader(monthNames, weekdayNames);
   fillDateInfoCardContent();
 
+  /* Fills the header of the info date card with a readable date.
+  */
   function fillDateInfoCardHeader(months, weekdays) {
     let splitDate = calendarInline.getValue()[0].toString().split(' ', 4);
     let readableDate = "";
@@ -171,6 +183,9 @@ function getCurrentUserId() {
     document.querySelector("#date-info-card .card-header").textContent = readableDate;
   }
 
+  /* Fills the content of the info date card with events that take place that day.
+  Event ID will be kept in the element data for future use.
+  */
   function fillDateInfoCardContent() {
     db.collection('Events').where('Creator', '==', getCurrentUserId()).where('Date', '==', firebase.firestore.Timestamp.fromDate(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()))).get().then((snapshot) => {
       snapshot.docs.forEach(doc => {
@@ -181,8 +196,11 @@ function getCurrentUserId() {
     })
   }
 
+  /* Opens the readEvent page for the clicked event.
+  Passes the event ID as an argument.
+  */
   $$(document).on('click', 'a.date-info-card-link', function() {
-    eventID = $$(this).attr("data-eventID");
+    readEvent($$(this).attr("data-eventID"));
   })
 
   //#endregion HOME
@@ -190,17 +208,19 @@ function getCurrentUserId() {
   //#region CREATE/UPDATE-EVENT
 
   // All the event type options available for event creation.
-  const eventTypeOptions = [{value:"birthday" , name:"Birthday"}, {value:"christmas" , name:"Christmas"}, {value:"newyear" , name:"New Year"}, {value:"chinesenewyear" , name:"Chinese New Year"}, {value:"valentinesday" , name:"Valentine's Day"}, {value:"mothersday" , name:"Mother's Day"}, {value:"fathersday" , name:"Father's Day"}, {value:"anniversary" , name:"Anniversary"}, {value:"hannukah" , name:"Hannukah"}, {value:"bartmitzvah" , name:"Bar/bat Mitzvah"}, {value:"wedding" , name:"Wedding"}, {value:"other" , name:"Other"}];
+  const eventTypes = [{value:"birthday" , name:"Birthday"}, {value:"christmas" , name:"Christmas"}, {value:"newyear" , name:"New Year"}, {value:"chinesenewyear" , name:"Chinese New Year"}, {value:"valentinesday" , name:"Valentine's Day"}, {value:"mothersday" , name:"Mother's Day"}, {value:"fathersday" , name:"Father's Day"}, {value:"anniversary" , name:"Anniversary"}, {value:"hannukah" , name:"Hannukah"}, {value:"bartmitzvah" , name:"Bar/bat Mitzvah"}, {value:"wedding" , name:"Wedding"}, {value:"other" , name:"Other"}];
 
   /* Fills the select input with the available options
   */
-  function fillSelectWithOptions() {
-    eventTypeOptions.forEach(option => {
+  function fillSelectWithOptions(crud) {
+    let elementID;
+    if (crud == "create") { elementID = "input-type"; }
+    else if (crud == "update") { elementID = "update-input-type"; }
+    eventTypes.forEach(type => {
       var tlines = "";
-      tlines += "<option value='" + option.value + "' selected>" + option.name + "</option>" // (https://framework7.io/docs/smart-select.html#examples see default setup)
-      $$("#input-type").append(tlines);
+      tlines += "<option value='" + type.value + "' selected>" + type.name + "</option>" // (https://framework7.io/docs/smart-select.html#examples see default setup)
+      $$("#" + elementID).append(tlines);
     })
-    document.getElementById("input-type").item(0).selected = 'selected'; // Auto select the first option (https://stackoverflow.com/a/10911660)
   }
 
   /* Checks if the form fields are empty.
@@ -247,7 +267,8 @@ function getCurrentUserId() {
     document.getElementById("input-all-day").addEventListener("click", function() {
       hideTimeInputs();
     });
-    fillSelectWithOptions();  
+    fillSelectWithOptions("create");
+    document.getElementById("input-type").item(0).selected = 'selected'; // Auto select the first option (https://stackoverflow.com/a/10911660)
   });
   
   /* Feeds all the input elements to the necessary functions to create an event.
@@ -288,6 +309,23 @@ function getCurrentUserId() {
     });
   }
 
+  function loadUpdateEvent(eventID) {
+    db.collection('Events').doc(eventID).get().then( function(doc) {
+      fillSelectWithOptions("update");
+
+      var formData = {
+        'title': doc.data().Title,
+        // 'all-day': doc.data().AllDay,
+        // 'date': doc.data().Date,
+        // 'start': doc.data().Start,
+        // 'end': doc.data().End,
+        // 'type': doc.data().Type,
+        'description': doc.data().Description
+      }
+      app.form.fillFromData('#form-update-event', formData);
+    })
+  }
+
   /* Resets the form.
   Activates when the "Erase Data" button is clicked.
   */
@@ -299,6 +337,45 @@ function getCurrentUserId() {
 
   //#region READ-EVENT
 
+  /* Converts a firebase.firestore.Timestamp object to a Date object.
+  https://www.youtube.com/watch?v=_3BtbFr-2X8
+  */
+  function convertTimestampToDate(timestamp) {
+    return new Date(timestamp.seconds * 1000);
+  }
+
+  /* Opens a new page displaying the details of the event that was clicked.
+  */
+  function readEvent(eventID) {
+    db.collection('Events').doc(eventID).get().then( function(doc) {
+      document.querySelector(".read-event-ID").setAttribute('id', doc.id);
+      $$("#read-event-title").html(doc.data().Title);
+      $$("#read-event-date").html(convertTimestampToDate(doc.data().Date).toLocaleDateString()); // (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString)
+      if(doc.data().AllDay) { document.getElementById("read-event-time").classList = "display-none"; } // Doesn't display start and end time if they don't exist.
+      else {
+        $$("#read-event-start").html(doc.data().Start);
+        $$("#read-event-end").html(doc.data().End);
+      }
+      eventTypes.forEach(type => { // Searches the eventTypes to display the type name and not the type value.
+        if(type.value == doc.data().Type) { $$("#read-event-type").html(type.name); }
+      })
+      $$("#read-event-description").html(doc.data().Description);
+    })
+  }
+
+  /* Opens the updateEvent page for the clicked event.
+  Passes the event ID as an argument.
+  */
+  $$(document).on('click', '#button-update-event', function() {
+    loadUpdateEvent(document.querySelector('.read-event-ID').getAttribute('id'));
+  })
+
+  /* Opens the readEvent page for the clicked event.
+  Passes the event ID as an argument.
+  */
+  $$(document).on('click', '#button-delete-event', function() {
+    $$('#read-event-ID').attr("data-eventID");
+  })
 
   //#endregion READ-EVENT
 
@@ -312,3 +389,4 @@ function getCurrentUserId() {
 
 // TODO: Stick calendar to bottom, and add a date information panel on top of the page
 // TODO: Add pull to refresh for home page
+// TODO: clicking back twice leaves you stranded
