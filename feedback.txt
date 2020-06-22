@@ -1,0 +1,27 @@
+dynamic links
+
+auto recommendation with api
+manual by user
+
+!!! difficult
+intents receiver 
+
+notifs
+
+friends, or sharing wishlists (both via QR code) --> generate Qr (parameter user UID or wishlist UID)
+use plugin to scan QR
+
+general view of all gifts (sortable and filterable: date, user, etc.)
+
+play store (amazon good)
+
+native: firebase login + adding/showing data in app. geen nadruk op design.
+
+documentation: not in detail.
+for example: routes, global variables, how things work (not a detailed function description)
+add all sources to documentation + explanation
+PID!
+
+make flowchart/presentation for next exam
+
+debuggen via chrome://inspect

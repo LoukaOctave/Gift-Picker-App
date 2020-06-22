@@ -40,7 +40,7 @@ var cApp = {
         receivedElement.setAttribute('style', 'display:block;');
 
         console.log('Received Event: ' + id);
-    }
+    },
+    // Add global variables here maybe
 };
-
 cApp.initialize();

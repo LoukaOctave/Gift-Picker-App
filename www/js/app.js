@@ -379,12 +379,6 @@ function getCurrentUserId() {
 
   //#endregion READ-EVENT
 
-  //#region READ-PROFILE
-
-  
-
-  //#endregion READ-PROFILE
-
 //#endregion APP
 
 /*********
@@ -407,4 +401,4 @@ function getCurrentUserId() {
 // TODO: Add possibility to change GUI color
 // TODO: Add dark mode toggle
 
-// ... more
+// ...
