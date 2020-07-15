@@ -188,12 +188,12 @@ function dateToCustomString(date, months, weekdays) {
       /*BUG [FIXED]: When selecting a date, async function firebase.firestore().get() is called.
       When switching rapidly between dates, the function won't finish executing before the next one is called, which can cause events of previously selected dates to appear in the card when they shoudln't.
       This is fixed by making sure the card gets emptied in this callback, right BEFORE it gets filled up again.
+      The next line was previously located before the firebase.firestore().get(). The order of the instructions caused the bug.
       */
       $$("#date-info-card .card-content .links-list ul li").remove();
       // Fill the card content
       if(snapshot.docs.length == 0) {
-        console.log("No events that day");
-        $$("#date-info-card .card-content .links-list ul").append("<li><p class='.date-info-card-no-events'>No events that day</p></li>");
+        $$("#date-info-card .card-content .links-list ul").append("<li><p class='date-info-card-no-events'>No events found that day</p></li>");
       }
       else {
         snapshot.docs.forEach(doc => {
@@ -244,15 +244,19 @@ function dateToCustomString(date, months, weekdays) {
   */
   function checkFormFields(title, allDay, date, start, end, type, description) {
     let bool = true;
+    let emptyFieldsAmount = 0;
+    let message;
     let fieldsToCheck = [title, date, type, description];
     if(!allDay.checked) { fieldsToCheck.push(start, end); }
     fieldsToCheck.forEach(field => {
       if(field.value == "") {
-        bool = false;
-        // TODO: write function for when field is empty (error, alert, etc.)
-        console.log("Please fill in a " + field.name + ".");
+        emptyFieldsAmount ++;
+        message = "Please fill in a " + field.name + ".";
       }
     })
+    if(emptyFieldsAmount > 0) { bool = false; }
+    if(emptyFieldsAmount > 1) { message = "Multiple fields need to be filled in."; }
+    document.querySelector(".form-message").textContent = message;
     return bool;
   }
 
@@ -406,12 +410,9 @@ function dateToCustomString(date, months, weekdays) {
 
 /* Home */
 // TODO: Add pull to refresh (for the calendar)
-// TODO: If there are no events on selected day, aproriate text should be displayed in card
-// TODO: Add loading gif for updateDateInfoCard(). Should be displayed during firebase.firestore().get() execution. 
+// OPTIONAL: Add loading gif for updateDateInfoCard(). Should be displayed during firebase.firestore().get() execution. 
 
 /* Add event */
-// TODO: Display error/success messages below form
-// TODO: If more than one error message, adapt to make sense
 // TODO: Make description optional
 // TODO: Update calendar upon event creation
 // TODO: Close event type selector on select
@@ -425,5 +426,6 @@ function dateToCustomString(date, months, weekdays) {
 // TODO: Add possibility to change password
 // TODO: Add possibility to change GUI color
 // TODO: Add dark mode toggle
+// TODO: Add weekday toggle
 
 // ...
