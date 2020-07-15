@@ -31,7 +31,7 @@ var app = new Framework7({
 var mainView = app.views.create('.view-main');
 
 /* Returns the userID that is currently stored.
- */
+*/
 function getCurrentUserId() {
   /* We need to fill in the currentUserID variable,
   otherwise on when app is launched (no ID in local or session storage),
@@ -42,6 +42,22 @@ function getCurrentUserId() {
   if (sessionStorage.getItem("userID")) { currentUserID = sessionStorage.getItem("userID"); }
   else if (localStorage.getItem("userID")) { currentUserID = localStorage.getItem("userID"); }
   return currentUserID;
+}
+
+/* Converts a JS Date object to the following string format: "Weekday, DD Month YYYY"
+*/
+function dateToCustomString(date, months, weekdays) {
+  let splitDate = date.toString().split(' ', 4);
+  let customString = "";
+  weekdays.forEach(weekday => {
+    if(weekday.slice(0, 3) == splitDate[0]){ customString += weekday + ", "; }
+  })
+  customString += splitDate[2] + " ";
+  months.forEach(month => {
+    if(month.slice(0, 3) == splitDate[1]){ customString += month + " "; }
+  })
+  customString += splitDate[3];
+  return customString;
 }
 
   //#endregion GENERAL
@@ -153,48 +169,47 @@ function getCurrentUserId() {
     /* When the selected value on the calendar changes, data will be shown at the bottom of the page.
     */
     calendarInline.on('change', function() {
-      $$("#date-info-card .card-content .links-list ul li").remove();
-      fillDateInfoCardHeader(monthNames, weekdayNames);
-      fillDateInfoCardContent();
+      updateDateInfoCard();
     })
 
     //#endregion CALENDAR
+  
+  /* Updates the information within the #date-info-card element.
+  Both the card header and card content will be updated (emptied and then filled again).
+  Card header displays a date in the following human-readable format: "Weekday, DD Month YYYY"
+  Card content contains an unordered list of links with events title as text. Clicking a link opens /readEvent/ page for that event.
+  */
+  function updateDateInfoCard() {
+    // Get the currently selected date from the calendar
+    selectedDate = calendarInline.getValue()[0];
+    // Fill the card header
+    document.querySelector("#date-info-card .card-header").textContent = dateToCustomString(selectedDate, monthNames, weekdayNames);
+    db.collection('Events').where('Creator', '==', getCurrentUserId()).where('Date', '==', firebase.firestore.Timestamp.fromDate(selectedDate)).get().then((snapshot) => {
+      /*BUG [FIXED]: When selecting a date, async function firebase.firestore().get() is called.
+      When switching rapidly between dates, the function won't finish executing before the next one is called, which can cause events of previously selected dates to appear in the card when they shoudln't.
+      This is fixed by making sure the card gets emptied in this callback, right BEFORE it gets filled up again.
+      */
+      $$("#date-info-card .card-content .links-list ul li").remove();
+      // Fill the card content
+      if(snapshot.docs.length == 0) {
+        console.log("No events that day");
+        $$("#date-info-card .card-content .links-list ul").append("<li><p class='.date-info-card-no-events'>No events that day</p></li>");
+      }
+      else {
+        snapshot.docs.forEach(doc => {
+          var tlines = "";
+          tlines += "<li><a class='date-info-card-link' href='/readEvent/' data-eventID='" + doc.id + "'>" + doc.data().Title + "</a></li>"
+          $$("#date-info-card .card-content .links-list ul").append(tlines);
+        });
+      }
+    })
+  }  
 
   // List of full weekday names.
   const weekdayNames = [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' ];
 
   // Functions to be executed at the start.
-  fillDateInfoCardHeader(monthNames, weekdayNames);
-  fillDateInfoCardContent();
-
-  /* Fills the header of the info date card with a readable date.
-  */
-  function fillDateInfoCardHeader(months, weekdays) {
-    let splitDate = calendarInline.getValue()[0].toString().split(' ', 4);
-    let readableDate = "";
-    weekdays.forEach(weekday => {
-      if(weekday.slice(0, 3) == splitDate[0]){ readableDate += weekday + ", "; }
-    })
-    readableDate += splitDate[2] + " ";
-    months.forEach(month => {
-      if(month.slice(0, 3) == splitDate[1]){ readableDate += month + " "; }
-    })
-    readableDate += splitDate[3];
-    document.querySelector("#date-info-card .card-header").textContent = readableDate;
-  }
-
-  /* Fills the content of the info date card with events that take place that day.
-  Event ID will be kept in the element data for future use.
-  */
-  function fillDateInfoCardContent() {
-    db.collection('Events').where('Creator', '==', getCurrentUserId()).where('Date', '==', firebase.firestore.Timestamp.fromDate(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()))).get().then((snapshot) => {
-      snapshot.docs.forEach(doc => {
-        var tlines = "";
-        tlines += "<li><a class='date-info-card-link' href='/readEvent/' data-eventID='" + doc.id + "'>" + doc.data().Title + "</a></li>"
-        $$("#date-info-card .card-content .links-list ul").append(tlines);
-      });
-    })
-  }
+  updateDateInfoCard();
 
   /* Opens the readEvent page for the clicked event.
   Passes the event ID as an argument.
@@ -386,11 +401,21 @@ function getCurrentUserId() {
 *********/
 
 /* General */
-// TODO: Clicking back button twice gives 404. Fix this.
+// TODO: Clicking back button twice gives 404. Fix this. (look for some sort of page history)
 // TODO: Settings button on top navbar that opens settings page
 
 /* Home */
-// TODO: Add pull to refresh for home page
+// TODO: Add pull to refresh (for the calendar)
+// TODO: If there are no events on selected day, aproriate text should be displayed in card
+// TODO: Add loading gif for updateDateInfoCard(). Should be displayed during firebase.firestore().get() execution. 
+
+/* Add event */
+// TODO: Display error/success messages below form
+// TODO: If more than one error message, adapt to make sense
+// TODO: Make description optional
+// TODO: Update calendar upon event creation
+// TODO: Close event type selector on select
+// TODO: Allow events to recur yearly. (remove year, just keep day and month)
 
 /* Update event */
 // TODO: Auto-fill fields on updateEvent

@@ -77,6 +77,13 @@ Add some spacing between child elements
     padding: 0 0.5em;
 }
 
+/* Home screen Date Info Card (No Events)
+Centers the text
+*/
+.date-info-card-no-events {
+    text-align: center;
+}
+
 /* Landscape layout (with min-width) */
 @media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
     .app {
