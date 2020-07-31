@@ -238,6 +238,19 @@ function dateToCustomString(date, months, weekdays) {
     })
   }
 
+  /* Updates the message below the form.
+  If the new message is the same as the current one, then the text will be put in bold for 1 second.
+  This is for users who spam the button to see that it does work and the action has (probably) been performed already. 
+  */
+  function updateFormMessage(newMessage) {
+    let formMsgTextBox = document.querySelector(".form-message");
+    if (newMessage == formMsgTextBox.textContent) {
+      formMsgTextBox.style = "font-weight: bold;"
+      setTimeout(function() { formMsgTextBox.removeAttribute('style'); }, 1000);
+    }
+    else { formMsgTextBox.textContent = newMessage }
+  }
+
   /* Checks if the form fields are empty.
   For all fields that are empty, there will be an error message. 
   If at least one field is empty, it will return false, otherwise it returns true.
@@ -256,7 +269,7 @@ function dateToCustomString(date, months, weekdays) {
     })
     if(emptyFieldsAmount > 0) { bool = false; }
     if(emptyFieldsAmount > 1) { message = "Multiple fields need to be filled in."; }
-    document.querySelector(".form-message").textContent = message;
+    updateFormMessage(message);
     return bool;
   }
 
@@ -274,6 +287,8 @@ function dateToCustomString(date, months, weekdays) {
   function formEventEraseData() {
     document.getElementById("form-create-event").reset();
     hideTimeInputs();
+    document.getElementById("input-type").item(0).selected = 'selected';
+    updateFormMessage("Fields emptied ");
   }
 
   $$(document).on('page:init', '.page[data-name="createEvent"]', function (e) { // (https://framework7.io/docs/page.html#page-events see page:init)
@@ -320,11 +335,11 @@ function dateToCustomString(date, months, weekdays) {
       Description: description.value,
     })
     .then(function() {
-      console.log("Document successfully written!");
       formEventEraseData();
+      updateFormMessage("Event succesfully created!");
     })
     .catch(function(error) {
-      console.error("Error writing document: ", error);
+      updateFormMessage("Error writing document: " + error);
     });
   }
 
