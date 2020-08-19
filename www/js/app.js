@@ -336,7 +336,7 @@ function dateToCustomString(date, months, weekdays) {
     })
     .then(function() {
       formEventEraseData();
-      updateFormMessage("Event succesfully created!");
+      updateFormMessage("Event successfully created!");
     })
     .catch(function(error) {
       updateFormMessage("Error writing document: " + error);
