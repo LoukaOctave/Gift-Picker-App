@@ -1,64 +1,64 @@
 //#region APP
 
   //#region GENERAL
-var $$ = Dom7;
+  var $$ = Dom7;
 
-var app = new Framework7({
-  // App root element
-  root: '#app',
-  // App Name
-  name: 'Gift Picker App',
-  // App id
-  id: 'be.odisee.loukaoctave.giftpickerapp',
-  // Add default routes (see routes.js)
-  routes: routes,
-  view: {
-    iosDynamicNavbar: false,
-    xhrCache: false,
-    router: true  
-  },
-  on: {
-    init: function() {
-      var f7 = this;
-      if (f7.device.cordova) {
-        // Init cordova APIs (see cordova-app.js)
-        cApp.init(f7);
+  var app = new Framework7({
+    // App root element
+    root: '#app',
+    // App Name
+    name: 'Gift Picker App',
+    // App id
+    id: 'be.odisee.loukaoctave.giftpickerapp',
+    // Add default routes (see routes.js)
+    routes: routes,
+    view: {
+      iosDynamicNavbar: false,
+      xhrCache: false,
+      router: true  
+    },
+    on: {
+      init: function() {
+        var f7 = this;
+        if (f7.device.cordova) {
+          // Init cordova APIs (see cordova-app.js)
+          cApp.init(f7);
+        }
       }
     }
-  }
-});
-  
-var mainView = app.views.create('.view-main');
+  });
+    
+  var mainView = app.views.create('.view-main');
 
-/* Returns the userID that is currently stored.
-*/
-function getCurrentUserId() {
-  /* We need to fill in the currentUserID variable,
-  otherwise on when app is launched (no ID in local or session storage),
-  this value will be null and the database function in updateDateRangeDatesInCalendarEvents() will lack arguments and fail calendar creation.
-  Calendar will not be able to update after login, because it hasn't been created properly.
+  /* Returns the userID that is currently stored.
   */
-  let currentUserID = "no ID"; 
-  if (sessionStorage.getItem("userID")) { currentUserID = sessionStorage.getItem("userID"); }
-  else if (localStorage.getItem("userID")) { currentUserID = localStorage.getItem("userID"); }
-  return currentUserID;
-}
+  function getCurrentUserId() {
+    /* We need to fill in the currentUserID variable,
+    otherwise on when app is launched (no ID in local or session storage),
+    this value will be null and the database function in updateDateRangeDatesInCalendarEvents() will lack arguments and fail calendar creation.
+    Calendar will not be able to update after login, because it hasn't been created properly.
+    */
+    let currentUserID = "no ID"; 
+    if (sessionStorage.getItem("userID")) { currentUserID = sessionStorage.getItem("userID"); }
+    else if (localStorage.getItem("userID")) { currentUserID = localStorage.getItem("userID"); }
+    return currentUserID;
+  }
 
-/* Converts a JS Date object to the following string format: "Weekday, DD Month YYYY"
-*/
-function dateToCustomString(date, months, weekdays) {
-  let splitDate = date.toString().split(' ', 4);
-  let customString = "";
-  weekdays.forEach(weekday => {
-    if(weekday.slice(0, 3) == splitDate[0]){ customString += weekday + ", "; }
-  })
-  customString += splitDate[2] + " ";
-  months.forEach(month => {
-    if(month.slice(0, 3) == splitDate[1]){ customString += month + " "; }
-  })
-  customString += splitDate[3];
-  return customString;
-}
+  /* Converts a JS Date object to the following string format: "Weekday, DD Month YYYY"
+  */
+  function dateToCustomString(date, months, weekdays) {
+    let splitDate = date.toString().split(' ', 4);
+    let customString = "";
+    weekdays.forEach(weekday => {
+      if(weekday.slice(0, 3) == splitDate[0]){ customString += weekday + ", "; }
+    })
+    customString += splitDate[2] + " ";
+    months.forEach(month => {
+      if(month.slice(0, 3) == splitDate[1]){ customString += month + " "; }
+    })
+    customString += splitDate[3];
+    return customString;
+  }
 
   //#endregion GENERAL
 
@@ -139,7 +139,7 @@ function dateToCustomString(date, months, weekdays) {
         Updates calendar
     */
     function updateDateRangeDatesInCalendarEvents() {
-      db.collection('Events').where('Creator', '==', getCurrentUserId()).get().then((snapshot) => {
+      db.collection('Events').where('Creator', '==', getCurrentUserId()).where('Date', '==', true).get().then((snapshot) => {
         calendarInline.params.events = [];
         snapshot.docs.forEach(doc => {
           calendarInline.params.events.push(createDateRangeDate(doc.data().Date.toDate(), "#ff0000", doc.id));
@@ -177,7 +177,7 @@ function dateToCustomString(date, months, weekdays) {
   /* Updates the information within the #date-info-card element.
   Both the card header and card content will be updated (emptied and then filled again).
   Card header displays a date in the following human-readable format: "Weekday, DD Month YYYY"
-  Card content contains an unordered list of links with events title as text. Clicking a link opens /readEvent/ page for that event.
+  Card content contains an unordered list of links with events title as text. Clicking a link opens /readUpdateEvent/ page for that event.
   */
   function updateDateInfoCard() {
     // Get the currently selected date from the calendar
@@ -198,7 +198,7 @@ function dateToCustomString(date, months, weekdays) {
       else {
         snapshot.docs.forEach(doc => {
           var tlines = "";
-          tlines += "<li><a class='date-info-card-link' href='/readEvent/' data-eventID='" + doc.id + "'>" + doc.data().Title + "</a></li>"
+          tlines += "<li><a class='date-info-card-link' href='/readUpdateEvent/' data-eventID='" + doc.id + "'>" + doc.data().Title + "</a></li>"
           $$("#date-info-card .card-content .links-list ul").append(tlines);
         });
       }
@@ -211,16 +211,16 @@ function dateToCustomString(date, months, weekdays) {
   // Functions to be executed at the start.
   updateDateInfoCard();
 
-  /* Opens the readEvent page for the clicked event.
+  /* Opens the readUpdateEvent page for the clicked event.
   Passes the event ID as an argument.
   */
   $$(document).on('click', 'a.date-info-card-link', function() {
-    readEvent($$(this).attr("data-eventID"));
+    readEvent(getEvent($$(this).attr("data-eventID")));
   })
 
   //#endregion HOME
 
-  //#region CREATE/UPDATE-EVENT
+  //#region EVENT
 
   // All the event type options available for event creation.
   const eventTypes = [{value:"birthday" , name:"Birthday"}, {value:"christmas" , name:"Christmas"}, {value:"newyear" , name:"New Year"}, {value:"chinesenewyear" , name:"Chinese New Year"}, {value:"valentinesday" , name:"Valentine's Day"}, {value:"mothersday" , name:"Mother's Day"}, {value:"fathersday" , name:"Father's Day"}, {value:"anniversary" , name:"Anniversary"}, {value:"hannukah" , name:"Hannukah"}, {value:"bartmitzvah" , name:"Bar/bat Mitzvah"}, {value:"wedding" , name:"Wedding"}, {value:"other" , name:"Other"}];
@@ -335,14 +335,15 @@ function dateToCustomString(date, months, weekdays) {
       Description: description.value,
     })
     .then(function() {
-      formEventEraseData();
       updateFormMessage("Event successfully created!");
+      formEventEraseData();
     })
     .catch(function(error) {
       updateFormMessage("Error writing document: " + error);
     });
   }
 
+  //TODO: Change this
   function loadUpdateEvent(eventID) {
     db.collection('Events').doc(eventID).get().then( function(doc) {
       fillSelectWithOptions("update");
@@ -367,10 +368,6 @@ function dateToCustomString(date, months, weekdays) {
     formEventEraseData();
   });
 
-  //#endregion CREATE/UPDATE-EVENT
-
-  //#region READ-EVENT
-
   /* Converts a firebase.firestore.Timestamp object to a Date object.
   https://www.youtube.com/watch?v=_3BtbFr-2X8
   */
@@ -378,40 +375,58 @@ function dateToCustomString(date, months, weekdays) {
     return new Date(timestamp.seconds * 1000);
   }
 
-  /* Opens a new page displaying the details of the event that was clicked.
-  */
-  function readEvent(eventID) {
+  function getEvent(eventID) {
     db.collection('Events').doc(eventID).get().then( function(doc) {
-      document.querySelector(".read-event-ID").setAttribute('id', doc.id);
-      $$("#read-event-title").html(doc.data().Title);
-      $$("#read-event-date").html(convertTimestampToDate(doc.data().Date).toLocaleDateString()); // (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString)
-      if(doc.data().AllDay) { document.getElementById("read-event-time").classList = "display-none"; } // Doesn't display start and end time if they don't exist.
-      else {
-        $$("#read-event-start").html(doc.data().Start);
-        $$("#read-event-end").html(doc.data().End);
-      }
-      eventTypes.forEach(type => { // Searches the eventTypes to display the type name and not the type value.
-        if(type.value == doc.data().Type) { $$("#read-event-type").html(type.name); }
-      })
-      $$("#read-event-description").html(doc.data().Description);
+      return doc
     })
   }
 
-  /* Opens the updateEvent page for the clicked event.
+  /* Opens a new page displaying the details of the event that was clicked.
+  */
+  function readEvent(event) {
+      document.querySelector(".read-event-ID").setAttribute('id', event.id);
+      $$("#read-event-title").html(event.data().Title);
+      $$("#read-event-date").html(convertTimestampToDate(event.data().Date).toLocaleDateString()); // (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString)
+      if(event.data().AllDay) { document.getElementById("read-event-time").classList = "display-none"; } // Doesn't display start and end time if they don't exist.
+      else {
+        $$("#read-event-start").html(event.data().Start);
+        $$("#read-event-end").html(event.data().End);
+      }
+      eventTypes.forEach(type => { // Searches the eventTypes to display the type name and not the type value.
+        if(type.value == event.data().Type) { $$("#read-event-type").html(type.name); }
+      })
+      $$("#read-event-description").html(event.data().Description);
+  }
+
+  /* Changes the readUpdateEvent page to update mode.
   Passes the event ID as an argument.
   */
   $$(document).on('click', '#button-update-event', function() {
     loadUpdateEvent(document.querySelector('.read-event-ID').getAttribute('id'));
   })
 
-  /* Opens the readEvent page for the clicked event.
+  /* Deletes the clicked event.
   Passes the event ID as an argument.
   */
   $$(document).on('click', '#button-delete-event', function() {
-    $$('#read-event-ID').attr("data-eventID");
+    // TODO: Write function deleteEvent()
   })
 
-  //#endregion READ-EVENT
+  /* Updates the event in the Firestore.
+  Passes the event ID as an argument.
+  */
+ $$(document).on('click', '#button-confirm-update-event', function() {
+   // TODO: Write function updateEvent(), then go back to main menu
+  })
+
+  /* Changes the readUpdateEvent page to update mode for the clicked event.
+    Passes the event ID as an argument.
+    */
+  $$(document).on('click', '#button-cancel-update-event', function() {
+    // TODO: Split off a part from function readEvent() and make function getEvent()
+  })
+
+//#endregion EVENT
 
 //#endregion APP
 
@@ -420,18 +435,17 @@ function dateToCustomString(date, months, weekdays) {
 *********/
 
 /* General */
-// TODO: Clicking back button twice gives 404. Fix this. (look for some sort of page history)
+// TODO: Clicking back button twice gives 404. Fix this. (look for some sort of page history) --> fix: not going back twice
 // TODO: Settings button on top navbar that opens settings page
+// TODO: Fix the icons (download and add to app folder)
+// TODO: Add loading gif for firebase functions. Should be displayed during firebase.firestore().get() execution. Add gif directly into HTML document and replace after.
 
 /* Home */
-// TODO: Add pull to refresh (for the calendar)
-// OPTIONAL: Add loading gif for updateDateInfoCard(). Should be displayed during firebase.firestore().get() execution. 
 
-/* Add event */
+/* Create event */
 // TODO: Make description optional
-// TODO: Update calendar upon event creation
-// TODO: Close event type selector on select
-// TODO: Allow events to recur yearly. (remove year, just keep day and month)
+// TODO: Close event type selector on select (if possible, suggestions: look for existing method or use eventListener to create one from scratch)
+// TODO: Allow events to recur yearly. (keep year in form, will be used as first occurence; add recurence boolean into firebase) !!!(when filling up calendar look for the recurrence bool first then add up to 5 years in the future for those events, others use their standard date year)
 
 /* Update event */
 // TODO: Auto-fill fields on updateEvent
