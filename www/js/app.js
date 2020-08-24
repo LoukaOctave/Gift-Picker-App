@@ -215,7 +215,7 @@
   Passes the event ID as an argument.
   */
   $$(document).on('click', 'a.date-info-card-link', function() {
-    readEvent(getEvent($$(this).attr("data-eventID")));
+    readEvent($$(this).attr("data-eventID"));
   })
 
   //#endregion HOME
@@ -383,7 +383,8 @@
 
   /* Opens a new page displaying the details of the event that was clicked.
   */
-  function readEvent(event) {
+  function readEvent(eventID) {
+    let event = getEvent(eventID);
       document.querySelector(".read-event-ID").setAttribute('id', event.id);
       $$("#read-event-title").html(event.data().Title);
       $$("#read-event-date").html(convertTimestampToDate(event.data().Date).toLocaleDateString()); // (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString)

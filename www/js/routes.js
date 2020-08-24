@@ -15,9 +15,9 @@ var routes = [
         name: 'createEvent'
     },
     {
-        path: '/readEvent/',
-        url: './pages/readEvent.html',
-        name: 'readEvent'
+        path: '/readUpdateEvent/',
+        url: './pages/readUpdateEvent.html',
+        name: 'readUpdateEvent'
     },
     {
         path: '/readProfile/',
@@ -28,11 +28,6 @@ var routes = [
         path: '/readWishlist/',
         url: './pages/readWishlist.html',
         name: 'readWishlist'
-    },
-    {
-        path: '/updateEvent/',
-        url: './pages/updateEvent.html',
-        name: 'updateEvent'
     },
     {
         path: '/updateProfile/',
