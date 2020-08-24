@@ -225,16 +225,24 @@
   // All the event type options available for event creation.
   const eventTypes = [{value:"birthday" , name:"Birthday"}, {value:"christmas" , name:"Christmas"}, {value:"newyear" , name:"New Year"}, {value:"chinesenewyear" , name:"Chinese New Year"}, {value:"valentinesday" , name:"Valentine's Day"}, {value:"mothersday" , name:"Mother's Day"}, {value:"fathersday" , name:"Father's Day"}, {value:"anniversary" , name:"Anniversary"}, {value:"hannukah" , name:"Hannukah"}, {value:"bartmitzvah" , name:"Bar/bat Mitzvah"}, {value:"wedding" , name:"Wedding"}, {value:"other" , name:"Other"}];
 
+  const formCreateEventID = "#form-create-event";
+  const formUpdateEventID = "#form-update-event";
+  const formInputTitleClass = ".input-title";
+  const formInputAllDayClass = ".input-all-day";
+  const formInputDateClass = ".input-date";
+  const formInputTimeClass = ".input-time";
+  const formInputStartClass = ".input-start";
+  const formInputEndClass = ".input-end";
+  const formInputTypeClass = ".input-type";
+  const formInputDescriptionClass = ".input-description";
+
   /* Fills the select input with the available options
   */
-  function fillSelectWithOptions(crud) {
-    let elementID;
-    if (crud == "create") { elementID = "input-type"; }
-    else if (crud == "update") { elementID = "update-input-type"; }
+  function fillSelectWithOptions(form) {
     eventTypes.forEach(type => {
       var tlines = "";
       tlines += "<option value='" + type.value + "' selected>" + type.name + "</option>" // (https://framework7.io/docs/smart-select.html#examples see default setup)
-      $$("#" + elementID).append(tlines);
+      $$(form + " " + formInputTypeClass).append(tlines);
     })
   }
 
@@ -249,13 +257,14 @@
       setTimeout(function() { formMsgTextBox.removeAttribute('style'); }, 1000);
     }
     else { formMsgTextBox.textContent = newMessage }
+    setTimeout(function() { formMsgTextBox.textContent = ""; }, 3000);
   }
 
   /* Checks if the form fields are empty.
   For all fields that are empty, there will be an error message. 
   If at least one field is empty, it will return false, otherwise it returns true.
   */
-  function checkFormFields(title, allDay, date, start, end, type, description) {
+  function checkFormFields(values) { //TODO: FIX THISSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
     let bool = true;
     let emptyFieldsAmount = 0;
     let message;
@@ -273,21 +282,20 @@
     return bool;
   }
 
-  /* Will hide or show the time inputs depending on the state of the toggle
+  /* Will hide or show the time inputs depending on the state of the toggle.
+  Accepts HTML ID attribute of the form (with the '#' prefix) as an argument.
   */
-  function hideTimeInputs() {
-    let toggle = document.getElementById("input-all-day");
-    let time = document.getElementById("input-time");
-    if(toggle.checked) { time.classList = "display-none"; } // (https://framework7.io/docs/typography.html#element-display see display-none)
-    else { time.classList = ""; }
+  function updateTimeInputVisibility(form) {
+    if (document.querySelector(form + " " + formInputAllDayClass).checked) { document.querySelector(form + " " + formInputTimeClass).classList.add("display-none"); } // (https://framework7.io/docs/typography.html#element-display see display-none)
+    else { document.querySelector(form + " " + formInputTimeClass).classList.remove("display-none"); }
   }
 
-  /* Resets the form.
+  /* Resets the create form.
   */
-  function formEventEraseData() {
-    document.getElementById("form-create-event").reset();
-    hideTimeInputs();
-    document.getElementById("input-type").item(0).selected = 'selected';
+  function formCreateEventEraseData() {
+    document.querySelector(formCreateEventID).reset();
+    updateTimeInputVisibility(formCreateEventID);
+    document.querySelector(formCreateEventID + " " + formInputTypeClass).item(0).selected = 'selected';
     updateFormMessage("Fields emptied ");
   }
 
@@ -298,32 +306,35 @@
     Whenever the toggle is clicked, it will check whether it is checked or not.
     Based on the status of the toggle, the time inputs will be hidden or shown.
     */
-    document.getElementById("input-all-day").addEventListener("click", function() {
-      hideTimeInputs();
+   document.querySelector(formCreateEventID + " " + formInputAllDayClass).addEventListener("click", function() {
+      updateTimeInputVisibility(formCreateEventID);
     });
-    fillSelectWithOptions("create");
-    document.getElementById("input-type").item(0).selected = 'selected'; // Auto select the first option (https://stackoverflow.com/a/10911660)
+    fillSelectWithOptions(formCreateEventID);
+    document.querySelector(formCreateEventID + " " + formInputTypeClass).item(0).selected = 'selected'; // Auto select the first option (https://stackoverflow.com/a/10911660)
   });
-  
+
   /* Feeds all the input elements to the necessary functions to create an event.
   Activates when the "Create Event" button is clicked.
   */
   $$(document).on('click', '#button-create-event', function() {
-    let title = document.getElementById("input-title");
-    let allDay = document.getElementById("input-all-day");
-    let date = document.getElementById("input-date");
-    let start = document.getElementById("input-start");
-    let end = document.getElementById("input-end");
-    let type = document.getElementById("input-type");
-    let description = document.getElementById("input-description");
-    if(checkFormFields(title, allDay, date, start, end, type, description)){ createEvent(title, allDay, date, start, end, type, description); };
+    let inputValues = [
+      {name: "title", value: document.querySelector(form + " " + formInputTitleClass)},
+      {name: "allDay", value: document.querySelector(form + " " + formInputAllDayClass)},
+      {name: "date", value: document.querySelector(form + " " + formInputDateClass)},
+      {name: "start", value: document.querySelector(form + " " + formInputStartClass)},
+      {name: "end", value: document.querySelector(form + " " + formInputEndClass)},
+      {name: "type", value: document.querySelector(form + " " + formInputTypeClass)},
+      {name: "description", value: document.querySelector(form + " " + formInputDescriptionClass)}
+    ]
+    
+    if(checkFormFields(inputValues)){ createEvent(inputValues); };
   });
 
   /* Adds an event to the Cloud Firestore.
   If event is added succesfully, form will be emptied and reset.
   Function based on: https://firebase.google.com/docs/firestore/manage-data/add-data?authuser=0#add_a_document
   */
-  function createEvent(title, allDay, date, start, end, type, description) {
+  function createEvent(values) {
     db.collection("Events").add({
       Creator: getCurrentUserId(),
       Title: title.value,
@@ -335,37 +346,19 @@
       Description: description.value,
     })
     .then(function() {
+      formCreateEventEraseData();
       updateFormMessage("Event successfully created!");
-      formEventEraseData();
     })
     .catch(function(error) {
       updateFormMessage("Error writing document: " + error);
     });
   }
 
-  //TODO: Change this
-  function loadUpdateEvent(eventID) {
-    db.collection('Events').doc(eventID).get().then( function(doc) {
-      fillSelectWithOptions("update");
-
-      var formData = {
-        'title': doc.data().Title,
-        // 'all-day': doc.data().AllDay,
-        // 'date': doc.data().Date,
-        // 'start': doc.data().Start,
-        // 'end': doc.data().End,
-        // 'type': doc.data().Type,
-        'description': doc.data().Description
-      }
-      app.form.fillFromData('#form-update-event', formData);
-    })
-  }
-
   /* Resets the form.
   Activates when the "Erase Data" button is clicked.
   */
   $$(document).on('click', '#button-clear-form', function() {
-    formEventEraseData();
+    formCreateEventEraseData();
   });
 
   /* Converts a firebase.firestore.Timestamp object to a Date object.
@@ -375,56 +368,94 @@
     return new Date(timestamp.seconds * 1000);
   }
 
-  function getEvent(eventID) {
+  $$(document).on('page:init', '.page[data-name="readUpdateEvent"]', function (e) {
+   document.querySelector("#form-update-event .input-all-day").addEventListener("click", function() {
+      updateTimeInputVisibility("#form-update-event");
+    });
+    fillSelectWithOptions(formUpdateEventID);
+  });
+
+  /* Fills the read UI of the /readUpdateEvent/ page with the event data.
+  Then: Shows only the read UI and hides the update UI.
+  */
+  function readEvent(eventID) {
     db.collection('Events').doc(eventID).get().then( function(doc) {
-      return doc
+      $$("#button-update-event").attr("data-eventID",(doc.id));
+      $$("#button-delete-event").attr("data-eventID",(doc.id));
+      $$("#read-event-title").html(doc.data().Title);
+      $$("#read-event-date").html(convertTimestampToDate(doc.data().Date).toLocaleDateString()); // (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString)
+      if(doc.data().AllDay) { document.getElementById("read-event-time").classList.add("display-none"); } // Doesn't display start and end time if they don't exist.
+      else {
+        $$("#read-event-start").html(doc.data().Start);
+        $$("#read-event-end").html(doc.data().End);
+      }
+      eventTypes.forEach(type => { // Searches the eventTypes to display the type name and not the type value.
+        if(type.value == doc.data().Type) { $$("#read-event-type").html(type.name); }
+      })
+      $$("#read-event-description").html(doc.data().Description);
+    }).then( function() {
+      loadReadOrUpdateMode("read");
     })
   }
 
-  /* Opens a new page displaying the details of the event that was clicked.
+  /* Fills the update UI of the /readUpdateEvent/ page with the event data.
+  Then: Shows only the update UI and hides the read UI.
   */
-  function readEvent(eventID) {
-    let event = getEvent(eventID);
-      document.querySelector(".read-event-ID").setAttribute('id', event.id);
-      $$("#read-event-title").html(event.data().Title);
-      $$("#read-event-date").html(convertTimestampToDate(event.data().Date).toLocaleDateString()); // (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString)
-      if(event.data().AllDay) { document.getElementById("read-event-time").classList = "display-none"; } // Doesn't display start and end time if they don't exist.
-      else {
-        $$("#read-event-start").html(event.data().Start);
-        $$("#read-event-end").html(event.data().End);
+  function openUpdateEvent(eventID) {
+    db.collection('Events').doc(eventID).get().then( function(doc) {
+
+      $$("#update-input-title").attr("value", doc.data().Title);
+      $$("#update-input-all-day").attr("checked", doc.data().AllDay);
+      $$("#update-input-date").attr("value", doc.data().Date);
+      updateTimeInputVisibility("#form-update-event");
+      if (!doc.data().AllDay) {
+        $$("#update-input-start").attr("value", doc.data().Start);
+        $$("#update-input-end").attr("value", doc.data().End);
       }
-      eventTypes.forEach(type => { // Searches the eventTypes to display the type name and not the type value.
-        if(type.value == event.data().Type) { $$("#read-event-type").html(type.name); }
-      })
-      $$("#read-event-description").html(event.data().Description);
+      //$$("#input-type").item("NUMERICAL VALUE COUPLED TO EVENT TYPES").selected = 'selected';
+      $$("#update-input-description").attr("value", doc.data().Description);
+      
+    }).then( function() {
+      loadReadOrUpdateMode("update");
+    })
+  }
+
+  function loadReadOrUpdateMode(mode) {
+    if (mode == "read") {
+      document.getElementById("read-event-UI").classList.remove("display-none");
+      document.getElementById("update-event-UI").classList.add("display-none");
+    }
+    else if (mode == "update") {
+      document.getElementById("update-event-UI").classList.remove("display-none");
+      document.getElementById("read-event-UI").classList.add("display-none");
+    }
   }
 
   /* Changes the readUpdateEvent page to update mode.
-  Passes the event ID as an argument.
   */
   $$(document).on('click', '#button-update-event', function() {
-    loadUpdateEvent(document.querySelector('.read-event-ID').getAttribute('id'));
+    openUpdateEvent($$(this).attr("data-eventID"));
   })
 
-  /* Deletes the clicked event.
+  /* Deletes the currently consulted event.
   Passes the event ID as an argument.
   */
   $$(document).on('click', '#button-delete-event', function() {
     // TODO: Write function deleteEvent()
+    deleteEvent($$(this).attr("data-eventID"))
   })
 
   /* Updates the event in the Firestore.
   Passes the event ID as an argument.
   */
  $$(document).on('click', '#button-confirm-update-event', function() {
-   // TODO: Write function updateEvent(), then go back to main menu
+   // TODO: Here it needs to update the event in Firebase, empty the read UI and change to read mode
   })
 
-  /* Changes the readUpdateEvent page to update mode for the clicked event.
-    Passes the event ID as an argument.
+  /* Changes the readUpdateEvent page back to read mode for the currently consulted event.
     */
   $$(document).on('click', '#button-cancel-update-event', function() {
-    // TODO: Split off a part from function readEvent() and make function getEvent()
+    loadReadOrUpdateMode("read");
   })
 
 //#endregion EVENT
@@ -436,7 +467,6 @@
 *********/
 
 /* General */
-// TODO: Clicking back button twice gives 404. Fix this. (look for some sort of page history) --> fix: not going back twice
 // TODO: Settings button on top navbar that opens settings page
 // TODO: Fix the icons (download and add to app folder)
 // TODO: Add loading gif for firebase functions. Should be displayed during firebase.firestore().get() execution. Add gif directly into HTML document and replace after.
