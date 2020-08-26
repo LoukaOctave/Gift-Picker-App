@@ -88,11 +88,9 @@ Centers the text
 */
 .loading-gif {
     display: block;
-    width: auto;
-    height: auto;
     max-width: 50px;
     max-height: 50px;
-    margin: auto auto;
+    margin: 50% auto;
 }
 
 /* Landscape layout (with min-width) */
