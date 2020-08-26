@@ -60,6 +60,16 @@
     return customString;
   }
 
+  /* Converts a JS Date object to the following string format: "YYYY-MM-DD"
+  */
+  function dateToYYYYMMDD(date) {
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    if (month < 10) { month = "0" + month; }
+    let day = date.getDate();
+    return year + "-" + month + "-" + day;
+  }
+
   //#endregion GENERAL
 
   //#region FIREBASE
@@ -235,6 +245,7 @@
   const formInputEndClass = ".input-end";
   const formInputTypeClass = ".input-type";
   const formInputDescriptionClass = ".input-description";
+  const formOutputMessageClass = ".output-message"
 
   /* Fills the select input with the available options
   */
@@ -250,8 +261,8 @@
   If the new message is the same as the current one, then the text will be put in bold for 1 second.
   This is for users who spam the button to see that it does work and the action has (probably) been performed already. 
   */
-  function updateFormMessage(newMessage) {
-    let formMsgTextBox = document.querySelector(".form-message");
+  function updateFormMessage(form, newMessage) {
+    let formMsgTextBox = document.querySelector(form + " " + formOutputMessageClass);
     if (newMessage == formMsgTextBox.textContent) {
       formMsgTextBox.style = "font-weight: bold;"
       setTimeout(function() { formMsgTextBox.removeAttribute('style'); }, 1000);
@@ -264,12 +275,12 @@
   For all fields that are empty, there will be an error message. 
   If at least one field is empty, it will return false, otherwise it returns true.
   */
-  function checkFormFields(values) { //TODO: FIX THISSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+  function checkFormFields(form, title, allDay, date, start, end, type, description) { 
     let bool = true;
     let emptyFieldsAmount = 0;
     let message;
-    let fieldsToCheck = [title, date, type, description];
-    if(!allDay.checked) { fieldsToCheck.push(start, end); }
+    let fieldsToCheck = [ title, date, type, description ];
+    if (!allDay.checked) { fieldsToCheck.push(start, end); }
     fieldsToCheck.forEach(field => {
       if(field.value == "") {
         emptyFieldsAmount ++;
@@ -278,7 +289,7 @@
     })
     if(emptyFieldsAmount > 0) { bool = false; }
     if(emptyFieldsAmount > 1) { message = "Multiple fields need to be filled in."; }
-    updateFormMessage(message);
+    updateFormMessage(form, message);
     return bool;
   }
 
@@ -296,7 +307,7 @@
     document.querySelector(formCreateEventID).reset();
     updateTimeInputVisibility(formCreateEventID);
     document.querySelector(formCreateEventID + " " + formInputTypeClass).item(0).selected = 'selected';
-    updateFormMessage("Fields emptied ");
+    updateFormMessage(formCreateEventID, "Fields emptied ");
   }
 
   $$(document).on('page:init', '.page[data-name="createEvent"]', function (e) { // (https://framework7.io/docs/page.html#page-events see page:init)
@@ -314,27 +325,26 @@
   });
 
   /* Feeds all the input elements to the necessary functions to create an event.
+  Event will only be created if the fields pass the check.
   Activates when the "Create Event" button is clicked.
   */
   $$(document).on('click', '#button-create-event', function() {
-    let inputValues = [
-      {name: "title", value: document.querySelector(form + " " + formInputTitleClass)},
-      {name: "allDay", value: document.querySelector(form + " " + formInputAllDayClass)},
-      {name: "date", value: document.querySelector(form + " " + formInputDateClass)},
-      {name: "start", value: document.querySelector(form + " " + formInputStartClass)},
-      {name: "end", value: document.querySelector(form + " " + formInputEndClass)},
-      {name: "type", value: document.querySelector(form + " " + formInputTypeClass)},
-      {name: "description", value: document.querySelector(form + " " + formInputDescriptionClass)}
-    ]
-    
-    if(checkFormFields(inputValues)){ createEvent(inputValues); };
+    let title = document.querySelector(formCreateEventID + " " + formInputTitleClass);
+    let allDay = document.querySelector(formCreateEventID + " " + formInputAllDayClass);
+    let date = document.querySelector(formCreateEventID + " " + formInputDateClass);
+    let start = document.querySelector(formCreateEventID + " " + formInputStartClass);
+    let end = document.querySelector(formCreateEventID + " " + formInputEndClass);
+    let type = document.querySelector(formCreateEventID + " " + formInputTypeClass);
+    let description = document.querySelector(formCreateEventID + " " + formInputDescriptionClass);
+
+    if (checkFormFields(formCreateEventID, title, allDay, date, start, end, type, description)){ createEvent(title, allDay, date, start, end, type, description); };
   });
 
   /* Adds an event to the Cloud Firestore.
   If event is added succesfully, form will be emptied and reset.
   Function based on: https://firebase.google.com/docs/firestore/manage-data/add-data?authuser=0#add_a_document
   */
-  function createEvent(values) {
+  function createEvent(title, allDay, date, start, end, type, description) {
     db.collection("Events").add({
       Creator: getCurrentUserId(),
       Title: title.value,
@@ -347,12 +357,36 @@
     })
     .then(function() {
       formCreateEventEraseData();
-      updateFormMessage("Event successfully created!");
+      updateFormMessage(formCreateEventID, "Event successfully created!");
     })
     .catch(function(error) {
-      updateFormMessage("Error writing document: " + error);
+      updateFormMessage(formCreateEventID, "Error creating event: " + error);
     });
   }
+
+  /* Updates the event in the Cloud Firestore.
+  On success it will make the /readUpdateEvent/ page go back into read mode (with the info being updated).
+    */
+  function updateEvent(eventID, title, allDay, date, start, end, type, description) {
+    db.collection('Events').doc(eventID).update({
+      Title: title.value,
+      AllDay: allDay.checked,
+      Date: firebase.firestore.Timestamp.fromDate(new Date(date.value + "T00:00:00")),
+      Start: start.value,
+      End: end.value,
+      Type: type.value,
+      Description: description.value,
+    })
+    .then(function() {
+      showLoadingIcon();
+      readEvent(eventID);
+      updateFormMessage(formUpdateEventID, "Event successfully updated!");
+    })
+    .catch(function(error) {
+      updateFormMessage(formUpdateEventID, "Error updating event: " + error);
+    });
+  }
+
 
   /* Resets the form.
   Activates when the "Erase Data" button is clicked.
@@ -369,9 +403,10 @@
   }
 
   $$(document).on('page:init', '.page[data-name="readUpdateEvent"]', function (e) {
-   document.querySelector("#form-update-event .input-all-day").addEventListener("click", function() {
-      updateTimeInputVisibility("#form-update-event");
+   document.querySelector(formUpdateEventID + " " + formInputAllDayClass).addEventListener("click", function() {
+      updateTimeInputVisibility(formUpdateEventID);
     });
+    showLoadingIcon();
     fillSelectWithOptions(formUpdateEventID);
   });
 
@@ -403,58 +438,74 @@
   */
   function openUpdateEvent(eventID) {
     db.collection('Events').doc(eventID).get().then( function(doc) {
-
-      $$("#update-input-title").attr("value", doc.data().Title);
-      $$("#update-input-all-day").attr("checked", doc.data().AllDay);
-      $$("#update-input-date").attr("value", doc.data().Date);
-      updateTimeInputVisibility("#form-update-event");
+      $$("#button-confirm-update-event").attr("data-eventID",(doc.id));
+      $$(formUpdateEventID + " " + formInputTitleClass).attr("value", doc.data().Title);
+      $$(formUpdateEventID + " " + formInputAllDayClass).attr("checked", doc.data().AllDay);
+      $$(formUpdateEventID + " " + formInputDateClass).attr("value", dateToYYYYMMDD(convertTimestampToDate(doc.data().Date)));
       if (!doc.data().AllDay) {
-        $$("#update-input-start").attr("value", doc.data().Start);
-        $$("#update-input-end").attr("value", doc.data().End);
+        $$(formUpdateEventID + " " + formInputStartClass).attr("value", doc.data().Start);
+        $$(formUpdateEventID + " " + formInputEndClass).attr("value", doc.data().End);
       }
-      //$$("#input-type").item("NUMERICAL VALUE COUPLED TO EVENT TYPES").selected = 'selected';
-      $$("#update-input-description").attr("value", doc.data().Description);
-      
+      document.querySelector(formUpdateEventID + " " + formInputTypeClass).item(eventTypes.findIndex(t => t.value == doc.data().Type)).selected = 'selected';
+      $$(formUpdateEventID + " " + formInputDescriptionClass).attr("value", doc.data().Description);
     }).then( function() {
       loadReadOrUpdateMode("update");
     })
   }
 
+  /*Gets everything off the screen to show the loading animation
+  */
+  function showLoadingIcon() {
+    document.querySelector(".loading-gif").classList.remove("display-none");
+    document.getElementById("read-event-UI").classList.add("display-none");
+    document.getElementById("update-event-UI").classList.add("display-none");
+  }
+
   function loadReadOrUpdateMode(mode) {
     if (mode == "read") {
+      document.querySelector(".loading-gif").classList.add("display-none");
       document.getElementById("read-event-UI").classList.remove("display-none");
       document.getElementById("update-event-UI").classList.add("display-none");
     }
     else if (mode == "update") {
+      document.querySelector(".loading-gif").classList.add("display-none");
       document.getElementById("update-event-UI").classList.remove("display-none");
       document.getElementById("read-event-UI").classList.add("display-none");
+      updateTimeInputVisibility(formUpdateEventID);
     }
   }
 
   /* Changes the readUpdateEvent page to update mode.
   */
   $$(document).on('click', '#button-update-event', function() {
+    showLoadingIcon();
     openUpdateEvent($$(this).attr("data-eventID"));
   })
 
   /* Deletes the currently consulted event.
   Passes the event ID as an argument.
   */
-  $$(document).on('click', '#button-delete-event', function() {
-    // TODO: Write function deleteEvent()
-    deleteEvent($$(this).attr("data-eventID"))
-  })
+  $$(document).on('click', '#button-delete-event', function() { deleteEvent($$(this).attr("data-eventID")); })
 
   /* Updates the event in the Firestore.
+  Only updates the event if the fields pass the check.
   Passes the event ID as an argument.
   */
  $$(document).on('click', '#button-confirm-update-event', function() {
-   // TODO: Here it needs to update the event in Firebase, empty the read UI and change to read mode
+  let title = document.querySelector(formUpdateEventID + " " + formInputTitleClass);
+  let allDay = document.querySelector(formUpdateEventID + " " + formInputAllDayClass);
+  let date = document.querySelector(formUpdateEventID + " " + formInputDateClass);
+  let start = document.querySelector(formUpdateEventID + " " + formInputStartClass);
+  let end = document.querySelector(formUpdateEventID + " " + formInputEndClass);
+  let type = document.querySelector(formUpdateEventID + " " + formInputTypeClass);
+  let description = document.querySelector(formUpdateEventID + " " + formInputDescriptionClass);
+  if (checkFormFields(formUpdateEventID, title, allDay, date, start, end, type, description)) { updateEvent($$(this).attr("data-eventID"), title, allDay, date, start, end, type, description); };
   })
 
   /* Changes the readUpdateEvent page back to read mode for the currently consulted event.
     */
-  $$(document).on('click', '#button-cancel-update-event', function() {
+  $$(document).on('click', '#button-cancel-update-event', function() { 
+    showLoadingIcon();
     loadReadOrUpdateMode("read");
   })
 
@@ -474,12 +525,11 @@
 /* Home */
 
 /* Create event */
-// TODO: Make description optional
 // TODO: Close event type selector on select (if possible, suggestions: look for existing method or use eventListener to create one from scratch)
 // TODO: Allow events to recur yearly. (keep year in form, will be used as first occurence; add recurence boolean into firebase) !!!(when filling up calendar look for the recurrence bool first then add up to 5 years in the future for those events, others use their standard date year)
 
 /* Update event */
-// TODO: Auto-fill fields on updateEvent
+// TODO: Fix toggle. Checked status is set when openUpdateEvent() is called, but visually it doesn't correspond. Dangerous: maybe when updating event it can cause problems.
 
 /* Settings */
 // TODO: Sign Out button on settings page

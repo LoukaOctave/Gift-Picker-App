@@ -9,6 +9,8 @@
     <meta name="theme-color" content="#ff4516">
     <!-- Your app title -->
     <title>Gift Picker App</title>
+    <!-- Material Icons CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- Path to Framework7 CSS -->
     <link rel="stylesheet" href="./framework7/css/framework7.bundle.min.css">
     <link rel="stylesheet" href="./framework7/css/framework7-icons.css">
@@ -31,6 +33,11 @@
               <div class="navbar-bg"></div>
               <div class="navbar-inner">
                 <div class="title">Home</div>
+                <div class="right">
+                  <a href="#" class="link">
+                    <span class="material-icons">settings</span>
+                  </a>
+              </div>
               </div>
             </div>
             <!-- Scrollable page content -->
@@ -58,15 +65,15 @@
           <div class="toolbar-inner">
             <!-- Toolbar links -->
             <a class="tab-link tab-link-active" id="home-button" href="#view-home">
-              <i class="icon f7-icons if-not-md">house_fill</i>
+              <span class="material-icons">home</span>
               <span class="tabbar-label">Home</span>
             </a>
             <a class="tab-link" id="add-button" href="#view-create-event">
-              <i class="icon f7-icons if-not-md">plus_circle</i>
+              <span class="material-icons">add_circle_outline</span>
               <span class="tabbar-label">Add</span>
             </a>
             <a class="tab-link" id="profile-button" href="#view-read-profile">
-              <i class="icon f7-icons if-not-md">person_fill</i>
+              <span class="material-icons">person</span>
               <span class="tabbar-label">Profile</span>
             </a>
           </div>

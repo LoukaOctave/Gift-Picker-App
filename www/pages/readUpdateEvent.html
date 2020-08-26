@@ -13,8 +13,9 @@
     </div>
   </div>
   <div class="page-content">
+    <img src="/img/loading.gif" class="loading-gif display-none">
     <!-- Read Event -->
-    <div id="read-event-UI">
+    <div class="display-none" id="read-event-UI">
       <div class="list">
         <ul>
           <li>
@@ -78,12 +79,12 @@
         </ul>
       </div>
       <div class="block block-strong row">
-        <div class="col"><a id="button-update-event" class="button">Update Event</a></div>
-        <div class="col"><a id="button-delete-event" class="button">Delete Event</a></div>
+        <div class="col"><a class="button" id="button-update-event">Update Event</a></div>
+        <div class="col"><a class="button" id="button-delete-event">Delete Event</a></div>
       </div>
     </div>
     <!-- Update Event -->
-    <div id="update-event-UI">
+    <div class="display-none" id="update-event-UI">
       <form class="list" id="form-update-event">
         <ul>
           <li>
@@ -123,7 +124,7 @@
               <div class="item-inner">
                 <div class="item-title item-label">Start</div>
                 <div class="item-input-wrap">
-                  <input class="-start" type="time" name="start">
+                  <input class="input-start" type="time" name="start">
                 </div>  
                 <div class="item-title item-label">End</div>
                 <div class="item-input-wrap">
@@ -154,11 +155,14 @@
             </div>
           </li>        
         </ul>
+        <div class="block block-strong row">
+          <div class="col"><a id="button-confirm-update-event" class="button" data-eventID="">Save Changes</a></div>
+          <div class="col"><a id="button-cancel-update-event" class="button" data-eventID="">Cancel</a></div>
+        </div>
+        <div class="block-footer">
+          <p class="output-message"></p> 
+        </div>
       </form>
-      <div class="block block-strong row">
-        <div class="col"><a id="button-confirm-update-event" class="button" data-eventID="">Save Changes</a></div>
-        <div class="col"><a id="button-cancel-update-event" class="button" data-eventID="">Cancel</a></div>
-      </div>
     </div>
   </div>
 </div>

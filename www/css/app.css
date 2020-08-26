@@ -84,6 +84,17 @@ Centers the text
     text-align: center;
 }
 
+/* Loading gif on /readUpdateEvent/ page
+*/
+.loading-gif {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 50px;
+    max-height: 50px;
+    margin: auto auto;
+}
+
 /* Landscape layout (with min-width) */
 @media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
     .app {
