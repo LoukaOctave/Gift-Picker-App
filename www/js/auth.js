@@ -7,6 +7,7 @@ var loginEmail = document.getElementById("login-email");
 var loginPassword = document.getElementById("login-password");
 var loginToggle = document.getElementById("login-toggle");
 var loginMessage = document.getElementById("login-message");
+var settingsScreen = document.querySelector(".settings-screen");
 
 openLoginScreenIfUserNotLoggedIn();
 
@@ -17,7 +18,7 @@ https://www.youtube.com/watch?v=qWy9ylc3f9U
 $$(document).on('click', '#button-sign-in', function() {
     auth.signInWithEmailAndPassword(loginEmail.value, loginPassword.value)
     .then(cred => {
-        storeUserCredentials(cred.user.uid);
+        setCurrentUserID(cred.user.uid);
         closeLoginScreen();
     })
     .catch(error => {
@@ -35,7 +36,7 @@ $$(document).on('click', '#button-sign-up', function() {
         db.collection('Users').doc(cred.user.uid).set({
             CreationTimestamp: firebase.firestore.Timestamp.fromDate(new Date())
         });
-        storeUserCredentials(cred.user.uid);
+        setCurrentUserID(cred.user.uid);
         closeLoginScreen();
     })
     .catch(error => {
@@ -43,11 +44,27 @@ $$(document).on('click', '#button-sign-up', function() {
     })
 })
 
+/* Signs out user, removes stored credentials and re-opens login screen.
+https://firebase.google.com/docs/auth/web/password-auth?authuser=0#next_steps
+*/
+$$(document).on('click', '#button-sign-out', function() {
+    auth.signOut()
+    .then( e => {
+        localStorage.removeItem("userID");
+        sessionStorage.removeItem("userID");
+        openLoginScreenIfUserNotLoggedIn();
+    })
+    .catch( error => {
+        // TODO: add an onscreen message for error
+        console.log(error.message);
+    })
+})
+
 /* Stores the uid of the current user.
 Depending on whether or not they wish to stay logged on, it'll store it differently.
 https://javascript.info/localstorage
  */
-function storeUserCredentials(uid) {
+function setCurrentUserID(uid) {
     if(loginToggle.checked) { localStorage.setItem("userID", uid); }
     else { sessionStorage.setItem("userID", uid); }
 }
@@ -75,22 +92,5 @@ function closeLoginScreen() {
 $$(document).on('loginscreen:close', function () {
     updateDateRangeDatesInCalendarEvents();
 })
-
-
-/* Signs out user, removes stored credentials and re-opens login screen.
-https://firebase.google.com/docs/auth/web/password-auth?authuser=0#next_steps
-*/
-function userSignOut() {
-    auth.signOut()
-    .then( e => {
-        localStorage.removeItem("userID");
-        sessionStorage.removeItem("userID");
-        openLoginScreenIfUserNotLoggedIn();
-    })
-    .catch( error => {
-        // TODO: add an onscreen message for error
-        console.log(error.message);
-    })
-}
 
 //#endregion AUTH
