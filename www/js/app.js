@@ -92,11 +92,6 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
   
-  // WHAT IS THIS FOR?
-  // let authWorkerApp = firebase.initializeApp(firebase.app().options, 'auth-worker');
-  // let authWorkerAuth = firebase.auth(authWorkerApp);
-  // authWorkerAuth.setPersistence(firebase.auth.Auth.Persistence.NONE); // disables caching of account credentials
-
   //#endregion FIREBASE
 
   //#region HOME  
@@ -229,6 +224,10 @@
   })
 
   //#endregion HOME
+
+  //#region SETTINGS
+
+  //#endregion SETTINGS
 
   //#region EVENT
 
@@ -518,9 +517,6 @@
 *********/
 
 /* General */
-// TODO: Settings button on top navbar that opens settings page
-// TODO: Fix the icons (download and add to app folder)
-// TODO: Add loading gif for firebase functions. Should be displayed during firebase.firestore().get() execution. Add gif directly into HTML document and replace after.
 
 /* Home */
 
@@ -532,7 +528,6 @@
 // TODO: Fix toggle. Checked status is set when openUpdateEvent() is called, but visually it doesn't correspond. Dangerous: maybe when updating event it can cause problems.
 
 /* Settings */
-// TODO: Sign Out button on settings page
 // TODO: Add possibility to change password
 // TODO: Add possibility to change GUI color
 // TODO: Add dark mode toggle
