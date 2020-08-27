@@ -519,6 +519,8 @@
 /* General */
 
 /* Home */
+// TODO: Filtering/sorting events
+// TODO: Different views (calendar/schedule)
 
 /* Create event */
 // TODO: Close event type selector on select (if possible, suggestions: look for existing method or use eventListener to create one from scratch)
